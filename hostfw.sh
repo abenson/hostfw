@@ -159,9 +159,21 @@ set_policy 'DROP'
 
 if [ $LOGEXCEPT -eq 1 ]; then
 	echo Logging exceptions...
-	$IPTABLES -A INPUT -j LOG
-	$IPTABLES -A OUTPUT -j LOG
-	$IPTABLES -A FORWARD -j LOG
+	logger=""
+	lsmod | grep -q "ipt_LOG"
+	if [ $? -eq 0 ]; then
+		logger="LOG"
+	fi
+	lsmod | grep -q "ipt_ULOG"
+	if [ $? -eq 0 ]; then
+		logger="ULOG"
+	fi
+	if [ -z $logger ]; then
+		echo "Please configure a valid logging method."
+	fi
+	$IPTABLES -A INPUT -j $logger
+	$IPTABLES -A OUTPUT -j $logger
+	$IPTABLES -A FORWARD -j $logger
 fi
 
 if [ $RESETCONN -eq 1 ]; then
