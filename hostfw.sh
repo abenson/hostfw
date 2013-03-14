@@ -190,7 +190,7 @@ if [ $ALLOWDHCP -eq 1 ]; then
 fi
 
 # Allow related connections.
-$IPTABLES -I INPUT 1 -m state --state ESTABLISHED,RELATED -j ACCEPT
+$IPTABLES -I INPUT 1 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 
 if [ -z $OB_TARGS ]; then
 	if [ -z $OB_TCP ]; then
