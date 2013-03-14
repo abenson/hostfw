@@ -23,7 +23,7 @@ IPTABLES=`which iptables 2>/dev/null`
 # the rules.
 
 if [ -z $IPTABLES ]; then
-	echo Unable to find \`iptables\` in path.
+	echo "Unable to find \`iptables\` in path."
 	exit
 fi
 
@@ -127,7 +127,7 @@ function set_policy
 # the other options, but we won't know what to do with both of these.
 
 if [ $ALLOWALL -eq 1 ] && [ $DENYALL -eq 1 ]; then
-	echo -A and -D are incompatible. 
+	echo "-A and -D are incompatible." 
 	echo
 	help_and_quit
 fi
@@ -158,7 +158,7 @@ flush_rules
 set_policy 'DROP'
 
 if [ $LOGEXCEPT -eq 1 ]; then
-	echo Logging exceptions...
+	echo "Logging exceptions..."
 	logger=""
 	lsmod | grep -q "ipt_LOG"
 	if [ $? -eq 0 ]; then
@@ -177,50 +177,51 @@ if [ $LOGEXCEPT -eq 1 ]; then
 fi
 
 if [ $RESETCONN -eq 1 ]; then
-	echo Send tcp-reset for unwanted connections...
+	echo "Send tcp-reset for unwanted connections..."
 	$IPTABLES -A INPUT -j REJECT
 	$IPTABLES -A OUTPUT -j REJECT
 	$IPTABLES -A FORWARD -j REJECT
 fi
 
 if [ $ALLOWDHCP -eq 1 ]; then
-	echo Allowing DHCP...
+	echo "Allowing DHCP..."
 	$IPTABLES -I INPUT 1 -p udp --dport 67:68 --sport 67:68 -j ACCEPT
 	$IPTABLES -I OUTPUT 1 -p udp --dport 67:68 --sport 67:68 -j ACCEPT
 fi
 
 # Allow related connections.
+echo "Allowing related connections..."
 $IPTABLES -I INPUT 1 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 
 if [ -z $OB_TARGS ]; then
 	if [ -z $OB_TCP ]; then
-		echo Not limiting outbound TCP connections.
+		echo "Not limiting outbound TCP connections."
 		$IPTABLES -I OUTPUT 1 -p tcp -j ACCEPT
 	else
-		echo Limiting outbound connections to TCP ports $OB_TCP.
+		echo "Limiting outbound connections to TCP ports $OB_TCP."
 		$IPTABLES -I OUTPUT 1 -p tcp -m multiport --dports $OB_TCP -j ACCEPT
 	fi
 	if [ -z $OB_UDP ]; then
-		echo Not limiting outbound UDP connections.
+		echo "Not limiting outbound UDP connections."
 		$IPTABLES -I OUTPUT 1 -p udp -j ACCEPT
 	else
-		echo Limiting outbound connections to UDP ports $OB_UDP.
+		echo "Limiting outbound connections to UDP ports $OB_UDP."
 		$IPTABLES -I OUTPUT 1 -p udp -m multiport --dports $OB_UDP -j ACCEPT
 	fi
 else
 	cat $OB_TARGS | sed 's/#.*//' | egrep -o "(^(?:(?:1?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\.){3}(?:1?[0-9]?[0-9]|2[0-4][0-9]|25[0-5]))(?:\/((?:[12]?[0-9])|(?:3[012])))?$" | while read net; do
 		if [ -z $OB_TCP ]; then
-			echo Limiting outbound TCP connections to $net.
+			echo "Limiting outbound TCP connections to $net."
 			$IPTABLES -I OUTPUT 1 -d $net -p tcp -j ACCEPT
 		else
-			echo Limiting outbound TCP connections to $net on ports $OB_TCP.
+			echo "Limiting outbound TCP connections to $net on ports $OB_TCP."
 			$IPTABLES -I OUTPUT 1 -d $net -p tcp -m multiport --dports $OB_TCP -j ACCEPT
 		fi
 		if [ -z $OB_UDP ]; then
-			echo Limiting outbound UDP connections to $net.
+			echo "Limiting outbound UDP connections to $net."
 			$IPTABLES -I OUTPUT 1 -d $net -p udp -j ACCEPT
 		else
-			echo Limiting outbound UDP connections to $net on ports $OB_UDP.
+			echo "Limiting outbound UDP connections to $net on ports $OB_UDP."
 			$IPTABLES -I OUTPUT 1 -d $net -p udp -m multiport --dports $OB_UDP -j ACCEPT
 		fi
 	done
@@ -228,40 +229,40 @@ fi
 
 if [ -z $IB_TARGS ]; then
 	if [ $ALLOWPING -eq 1 ]; then
-		echo Respond to pings...
+		echo "Respond to pings..."
 		$IPTABLES -I INPUT 1 -p icmp --icmp-type 8 -j ACCEPT
 	fi
 
 	if [ -z $IB_TCP ]; then
-		echo Not allowing inbound TCP connections.
+		echo "Not allowing inbound TCP connections."
 	else
-		echo Allowing inbound TCP connections to ports $IB_TCP.
+		echo "Allowing inbound TCP connections to ports $IB_TCP."
 		$IPTABLES -I INPUT 1 -p tcp -m multiport --dports $IB_TCP -j ACCEPT
 	fi
 	if [ -z $IB_UDP ]; then
-		echo Not allowing inbound UDP connections.
+		echo "Not allowing inbound UDP connections."
 	else
-		echo Allowing inbound UDP connections to ports $IB_UDP.
+		echo "Allowing inbound UDP connections to ports $IB_UDP."
 		$IPTABLES -I INPUT 1  -p udp -m multiport --dports $IB_UDP -j ACCEPT
 	fi
 else
 	cat $IB_TARGS | sed 's/#.*//' | egrep -o "(^(?:(?:1?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\.){3}(?:1?[0-9]?[0-9]|2[0-4][0-9]|25[0-5]))(?:\/((?:[12]?[0-9])|(?:3[012])))?$" | while read net; do
 		if [ $ALLOWPING -eq 1 ]; then
-			echo Respond to pings from $net...
+			echo "Respond to pings from $net..."
 			$IPTABLES -I INPUT 1 -s $net -p icmp --icmp-type 8 -j ACCEPT
 		fi
 
 		if [ -z $IB_TCP ]; then
-			echo Not allowing inbound TCP connections.
+			echo "Not allowing inbound TCP connections."
 		else
-			echo Allowing inbound TCP connections from $net on ports $IB_TCP.
+			echo "Allowing inbound TCP connections from $net on ports $IB_TCP."
 			$IPTABLES -I INPUT 1 -s $net -p tcp -m multiport --dports $IB_TCP -j ACCEPT
 		fi
 		
 		if [ -z $IB_UDP ]; then
-			echo Not allowing inbound UDP connections.
+			echo "Not allowing inbound UDP connections."
 		else
-			echo Allowing inbound UDP connections from $net on ports $IB_UDP.
+			echo "Allowing inbound UDP connections from $net on ports $IB_UDP."
 			$IPTABLES -I INPUT 1 -s $net -p udp -m multiport --dports $IB_UDP -j ACCEPT
 		fi
 	done
