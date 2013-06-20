@@ -56,7 +56,7 @@ if [ -z $IPTABLES ]; then
 	exit
 fi
 
-function help_and_quit
+help_and_quit()
 {
 	echo "usage: $0 <options>"
 cat <<HELPMSG
@@ -136,7 +136,7 @@ while [ ! -z "$1" ]; do
 done
 
 # Handy wrapper to clear the rules. 
-function flush_rules
+flush_rules()
 {
 	$IPTABLES -F INPUT
 	$IPTABLES -F OUTPUT
@@ -144,7 +144,7 @@ function flush_rules
 } 
 
 # Handy wrapper to set the policy of each chain. 
-function set_policy
+set_policy()
 {
 	$IPTABLES -P INPUT $1
 	$IPTABLES -P OUTPUT $1
