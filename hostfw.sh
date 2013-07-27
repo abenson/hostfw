@@ -303,8 +303,8 @@ $IPTABLES -I INPUT 1 -s 127.0.0.1/8 -d 127.0.0.1 -j ACCEPT
 $IPTABLES -I OUTPUT 1 -s 127.0.0.1/8 -d 127.0.0.1 -j ACCEPT
 
 # If requested so the rules just created.
-echo ""
-echo "Applied rules:"
 if [ $SHOWRULES -eq 1 ]; then
+	echo ""
+	echo "Applied rules:"
 	$IPTABLES -S
 fi
