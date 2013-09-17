@@ -46,7 +46,21 @@ ALLOWALL="0"
 DENYALL="0"
 SHOWRULES="0"
 
+# You must be root (uid=0) to set iptables rules.
+if [ `id -u` != "0" ]; then
+	echo "You must be root to run this command."
+	exit
+fi
+
 IPTABLES=`which iptables 2>/dev/null`
+
+# We want to make sure iptables is available before we attempt to create 
+# the rules.
+
+if [ -z $IPTABLES ]; then
+	echo "Unable to find \`iptables\` in path."
+	exit
+fi
 
 help_and_quit()
 {
@@ -151,20 +165,6 @@ if [ $ALLOWALL -eq 1 ] && [ $DENYALL -eq 1 ]; then
 	echo "-A and -D are incompatible." 
 	echo
 	help_and_quit
-fi
-
-# You must be root (uid=0) to set iptables rules.
-if [ `id -u` != "0" ]; then
-	echo "You must be root to run this command."
-	exit
-fi
-
-# We want to make sure iptables is available before we attempt to create 
-# the rules.
-
-if [ -z $IPTABLES ]; then
-	echo "Unable to find \`iptables\` in path."
-	exit
 fi
 
 # Formula is the same for each of these. 
