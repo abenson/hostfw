@@ -45,6 +45,7 @@ IB_TARGS=""
 ALLOWALL="0"
 DENYALL="0"
 SHOWRULES="0"
+PRINTSTATUS="1"
 
 # You must be root (uid=0) to set iptables rules.
 if [ `id -u` != "0" ]; then
@@ -86,8 +87,7 @@ cat <<HELPMSG
 	-l                 Log exceptions.
 
         -s                 Simulate only.
-                           (Prints commands to stdout, useful for generating 
-                            a script for later.)
+        -q                 Quiet (don't display status messages)
 
 	-D                 Absolute deny all.
 	-A                 Absolute allow all.
@@ -100,6 +100,10 @@ Defaults:
 	DHCP will be enabled.
 	Ping responses will be enabled.
 	Unsolicited inbound connections will be dropped.
+
+Notes:
+
+	Combine -q and -s to generate a script.
 
 HELPMSG
 	exit
@@ -143,6 +147,8 @@ while [ ! -z "$1" ]; do
 			ALLOWALL="1" ;;
 		"-s" )
 			IPTABLES="echo $IPTABLES" ;;
+		"-q" )
+			PRINTSTATUS="0" ;;
 	esac
 	shift
 done
@@ -179,17 +185,25 @@ fi
 # 3. Don't do anything else.
 
 if [ $ALLOWALL -eq 1 ]; then
-	echo "Flushing rules..."
+	if [ $PRINTSTATUS -eq 1 ]; then
+		echo "Flushing rules..."
+	fi
 	flush_rules
-	echo "Allowing all..."
+	if [ $PRINTSTATUS -eq 1 ]; then
+		echo "Allowing all..."
+	fi
 	set_policy 'ACCEPT'
 	exit
 fi
 
 if [ $DENYALL -eq 1 ]; then
-	echo "Flushing rules..."
+	if [ $PRINTSTATUS -eq 1 ]; then
+		echo "Flushing rules..."
+	fi
 	flush_rules
-	echo "Allowing all..."
+	if [ $PRINTSTATUS -eq 1 ]; then
+		echo "Allowing all..."
+	fi
 	set_policy 'DROP'
 	exit
 fi
@@ -199,7 +213,9 @@ flush_rules
 set_policy 'DROP'
 
 if [ $LOGEXCEPT -eq 1 ]; then
-	echo "Logging exceptions..."
+	if [ $PRINTSTATUS -eq 1 ]; then
+		echo "Logging exceptions..."
+	fi
 	logger=""
 	lsmod | grep -q "ipt_LOG"
 	if [ $? -eq 0 ]; then
@@ -218,51 +234,73 @@ if [ $LOGEXCEPT -eq 1 ]; then
 fi
 
 if [ $RESETCONN -eq 1 ]; then
-	echo "Send tcp-reset for unwanted connections..."
+	if [ $PRINTSTATUS -eq 1 ]; then
+		echo "Send tcp-reset for unwanted connections..."
+	fi
 	$IPTABLES -A INPUT -j REJECT
 	$IPTABLES -A OUTPUT -j REJECT
 	$IPTABLES -A FORWARD -j REJECT
 fi
 
 if [ $ALLOWDHCP -eq 1 ]; then
-	echo "Allowing DHCP..."
+	if [ $PRINTSTATUS -eq 1 ]; then
+		echo "Allowing DHCP..."
+	fi
 	$IPTABLES -I INPUT 1 -p udp --dport 67:68 --sport 67:68 -j ACCEPT
 	$IPTABLES -I OUTPUT 1 -p udp --dport 67:68 --sport 67:68 -j ACCEPT
 fi
 
 # Allow related connections.
-echo "Allowing related connections..."
+if [ $PRINTSTATUS -eq 1 ]; then
+	echo "Allowing related connections..."
+fi
 $IPTABLES -I INPUT 1 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 
 if [ -z $OB_TARGS ]; then
 	if [ -z $OB_TCP ]; then
-		echo "Not limiting outbound TCP connections."
+		if [ $PRINTSTATUS -eq 1 ]; then
+			echo "Not limiting outbound TCP connections."
+		fi
 		$IPTABLES -I OUTPUT 1 -p tcp -j ACCEPT
 	else
-		echo "Limiting outbound connections to TCP ports $OB_TCP."
+		if [ $PRINTSTATUS -eq 1 ]; then
+			echo "Limiting outbound connections to TCP ports $OB_TCP."
+		fi
 		$IPTABLES -I OUTPUT 1 -p tcp -m multiport --dports $OB_TCP -j ACCEPT
 	fi
 	if [ -z $OB_UDP ]; then
-		echo "Not limiting outbound UDP connections."
+		if [ $PRINTSTATUS -eq 1 ]; then
+			echo "Not limiting outbound UDP connections."
+		fi
 		$IPTABLES -I OUTPUT 1 -p udp -j ACCEPT
 	else
-		echo "Limiting outbound connections to UDP ports $OB_UDP."
+		if [ $PRINTSTATUS -eq 1 ]; then
+			echo "Limiting outbound connections to UDP ports $OB_UDP."
+		fi
 		$IPTABLES -I OUTPUT 1 -p udp -m multiport --dports $OB_UDP -j ACCEPT
 	fi
 else
 	cat $OB_TARGS | sed 's/#.*//' | egrep -o "(^(?:(?:1?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\.){3}(?:1?[0-9]?[0-9]|2[0-4][0-9]|25[0-5]))(?:\/((?:[12]?[0-9])|(?:3[012])))?$" | while read net; do
 		if [ -z $OB_TCP ]; then
-			echo "Limiting outbound TCP connections to $net."
+			if [ $PRINTSTATUS -eq 1 ]; then
+				echo "Limiting outbound TCP connections to $net."
+			fi
 			$IPTABLES -I OUTPUT 1 -d $net -p tcp -j ACCEPT
 		else
-			echo "Limiting outbound TCP connections to $net on ports $OB_TCP."
+			if [ $PRINTSTATUS -eq 1 ]; then
+				echo "Limiting outbound TCP connections to $net on ports $OB_TCP."
+			fi
 			$IPTABLES -I OUTPUT 1 -d $net -p tcp -m multiport --dports $OB_TCP -j ACCEPT
 		fi
 		if [ -z $OB_UDP ]; then
-			echo "Limiting outbound UDP connections to $net."
+			if [ $PRINTSTATUS -eq 1 ]; then
+				echo "Limiting outbound UDP connections to $net."
+			fi
 			$IPTABLES -I OUTPUT 1 -d $net -p udp -j ACCEPT
 		else
-			echo "Limiting outbound UDP connections to $net on ports $OB_UDP."
+			if [ $PRINTSTATUS -eq 1 ]; then
+				echo "Limiting outbound UDP connections to $net on ports $OB_UDP."
+			fi
 			$IPTABLES -I OUTPUT 1 -d $net -p udp -m multiport --dports $OB_UDP -j ACCEPT
 		fi
 	done
@@ -270,53 +308,77 @@ fi
 
 if [ -z $IB_TARGS ]; then
 	if [ $ALLOWPING -eq 1 ]; then
-		echo "Respond to pings..."
+		if [ $PRINTSTATUS -eq 1 ]; then
+			echo "Respond to pings..."
+		fi
 		$IPTABLES -I INPUT 1 -p icmp --icmp-type 8 -j ACCEPT
 	fi
 
 	if [ -z $IB_TCP ]; then
-		echo "Not allowing inbound TCP connections."
+		if [ $PRINTSTATUS -eq 1 ]; then
+			echo "Not allowing inbound TCP connections."
+		fi
 	else
-		echo "Allowing inbound TCP connections to ports $IB_TCP."
+		if [ $PRINTSTATUS -eq 1 ]; then
+			echo "Allowing inbound TCP connections to ports $IB_TCP."
+		fi
 		$IPTABLES -I INPUT 1 -p tcp -m multiport --dports $IB_TCP -j ACCEPT
 	fi
 	if [ -z $IB_UDP ]; then
-		echo "Not allowing inbound UDP connections."
+		if [ $PRINTSTATUS -eq 1 ]; then
+			echo "Not allowing inbound UDP connections."
+		fi
 	else
-		echo "Allowing inbound UDP connections to ports $IB_UDP."
+		if [ $PRINTSTATUS -eq 1 ]; then
+			echo "Allowing inbound UDP connections to ports $IB_UDP."
+		fi
 		$IPTABLES -I INPUT 1  -p udp -m multiport --dports $IB_UDP -j ACCEPT
 	fi
 else
 	cat $IB_TARGS | sed 's/#.*//' | egrep -o "(^(?:(?:1?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\.){3}(?:1?[0-9]?[0-9]|2[0-4][0-9]|25[0-5]))(?:\/((?:[12]?[0-9])|(?:3[012])))?$" | while read net; do
 		if [ $ALLOWPING -eq 1 ]; then
-			echo "Respond to pings from $net..."
+			if [ $PRINTSTATUS -eq 1 ]; then
+				echo "Respond to pings from $net..."
+			fi
 			$IPTABLES -I INPUT 1 -s $net -p icmp --icmp-type 8 -j ACCEPT
 		fi
 
 		if [ -z $IB_TCP ]; then
-			echo "Not allowing inbound TCP connections."
+			if [ $PRINTSTATUS -eq 1 ]; then
+				echo "Not allowing inbound TCP connections."
+			fi
 		else
-			echo "Allowing inbound TCP connections from $net on ports $IB_TCP."
+			if [ $PRINTSTATUS -eq 1 ]; then
+				echo "Allowing inbound TCP connections from $net on ports $IB_TCP."
+			fi
 			$IPTABLES -I INPUT 1 -s $net -p tcp -m multiport --dports $IB_TCP -j ACCEPT
 		fi
 		
 		if [ -z $IB_UDP ]; then
-			echo "Not allowing inbound UDP connections."
+			if [ $PRINTSTATUS -eq 1 ]; then
+				echo "Not allowing inbound UDP connections."
+			fi
 		else
-			echo "Allowing inbound UDP connections from $net on ports $IB_UDP."
+			if [ $PRINTSTATUS -eq 1 ]; then
+				echo "Allowing inbound UDP connections from $net on ports $IB_UDP."
+			fi
 			$IPTABLES -I INPUT 1 -s $net -p udp -m multiport --dports $IB_UDP -j ACCEPT
 		fi
 	done
 fi
 
 # Allow localhost traffic.
-echo "Allowing traffic for localhost."
+if [ $PRINTSTATUS -eq 1 ]; then
+	echo "Allowing traffic for localhost."
+fi
 $IPTABLES -I INPUT 1 -s 127.0.0.1/8 -d 127.0.0.1 -j ACCEPT
 $IPTABLES -I OUTPUT 1 -s 127.0.0.1/8 -d 127.0.0.1 -j ACCEPT
 
 # If requested so the rules just created.
 if [ $SHOWRULES -eq 1 ]; then
 	echo ""
-	echo "Applied rules:"
+	if [ $PRINTSTATUS -eq 1 ]; then
+		echo "Applied rules:"
+	fi
 	$IPTABLES -S
 fi
