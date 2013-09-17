@@ -213,9 +213,6 @@ flush_rules
 set_policy 'DROP'
 
 if [ $LOGEXCEPT -eq 1 ]; then
-	if [ $PRINTSTATUS -eq 1 ]; then
-		echo "Logging exceptions..."
-	fi
 	logger=""
 	lsmod | grep -q "ipt_LOG"
 	if [ $? -eq 0 ]; then
@@ -226,11 +223,15 @@ if [ $LOGEXCEPT -eq 1 ]; then
 		logger="ULOG"
 	fi
 	if [ -z $logger ]; then
-		echo "Please configure a valid logging method."
+		echo "Will not log; Please configure a valid logging method."
+	else
+		if [ $PRINTSTATUS -eq 1 ]; then
+			echo "Logging exceptions..."
+		fi
+		$IPTABLES -A INPUT -j $logger
+		$IPTABLES -A OUTPUT -j $logger
+		$IPTABLES -A FORWARD -j $logger
 	fi
-	$IPTABLES -A INPUT -j $logger
-	$IPTABLES -A OUTPUT -j $logger
-	$IPTABLES -A FORWARD -j $logger
 fi
 
 if [ $RESETCONN -eq 1 ]; then
