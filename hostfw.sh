@@ -85,6 +85,10 @@ cat <<HELPMSG
 
 	-l                 Log exceptions.
 
+        -s                 Simulate only.
+                           (Prints commands to stdout, useful for generating 
+                            a script for later.)
+
 	-D                 Absolute deny all.
 	-A                 Absolute allow all.
 
@@ -137,6 +141,8 @@ while [ ! -z "$1" ]; do
 			DENYALL="1" ;;
 		"-A" )
 			ALLOWALL="1" ;;
+		"-s" )
+			IPTABLES="echo $IPTABLES" ;;
 	esac
 	shift
 done
