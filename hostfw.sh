@@ -256,6 +256,7 @@ if [ $PRINTSTATUS -eq 1 ]; then
 	echo "Allowing related connections..."
 fi
 $IPTABLES -I INPUT 1 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+$IPTABLES -I OUTPUT 1 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 
 if [ -z $OB_TARGS ]; then
 	if [ -z $OB_TCP ]; then
