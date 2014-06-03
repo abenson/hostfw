@@ -282,7 +282,7 @@ if [ -z $OB_TARGS ]; then
 		$IPTABLES -I OUTPUT 1 -p udp -m multiport --dports $OB_UDP -j ACCEPT
 	fi
 else
-	cat $OB_TARGS | sed 's/#.*//' | egrep -o "(^(?:(?:1?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\.){3}(?:1?[0-9]?[0-9]|2[0-4][0-9]|25[0-5]))(?:\/((?:[12]?[0-9])|(?:3[012])))?$" | while read net; do
+	cat $OB_TARGS | sed 's/#.*//' | egrep -o "(^|[^0-9.])((25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])(/[0-9][0-9]?)?($|[^0-9.])" | while read net; do
 		if [ -z $OB_TCP ]; then
 			if [ $PRINTSTATUS -eq 1 ]; then
 				echo "Limiting outbound TCP connections to $net."
@@ -337,7 +337,7 @@ if [ -z $IB_TARGS ]; then
 		$IPTABLES -I INPUT 1  -p udp -m multiport --dports $IB_UDP -j ACCEPT
 	fi
 else
-	cat $IB_TARGS | sed 's/#.*//' | egrep -o "(^(?:(?:1?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\.){3}(?:1?[0-9]?[0-9]|2[0-4][0-9]|25[0-5]))(?:\/((?:[12]?[0-9])|(?:3[012])))?$" | while read net; do
+	cat $IB_TARGS | sed 's/#.*//' | egrep -o "(^|[^0-9.])((25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])(/[0-9][0-9]?)?($|[^0-9.])" | while read net; do
 		if [ $ALLOWPING -eq 1 ]; then
 			if [ $PRINTSTATUS -eq 1 ]; then
 				echo "Respond to pings from $net..."
