@@ -42,10 +42,13 @@ IB_TCP=""
 IB_UDP=""
 OB_TARGS=""
 IB_TARGS=""
+AUTOTRUST="0"
 ALLOWALL="0"
 DENYALL="0"
 SHOWRULES="0"
 PRINTSTATUS="1"
+DEFTRUST="/etc/trusted.hosts"
+DEFTARGS="/etc/target.hosts"
 
 # You must be root (uid=0) to set iptables rules.
 if [ `id -u` != "0" ]; then
@@ -74,6 +77,9 @@ cat <<HELPMSG
 	-p                 Disallow incoming PING
 
 	-d                 Disallow DHCP.
+
+	-tt                Automatically set rules based on /etc/trusted.hosts 
+                           and /etc/target.hosts
 
 	-ot <...>          Comma separated list of allowed TCP ports outbound.
 	-ou <...>          Comma separated list of allowed UDP ports outbound.
@@ -145,6 +151,8 @@ while [ ! -z "$1" ]; do
 			DENYALL="1" ;;
 		"-A" )
 			ALLOWALL="1" ;;
+		"-tt")
+			AUTOTRUST="1" ;;
 		"-s" )
 			IPTABLES="echo $IPTABLES" ;;
 		"-q" )
@@ -168,6 +176,18 @@ set_policy()
 	$IPTABLES -P OUTPUT $1
 	$IPTABLES -P FORWARD $1
 }
+
+
+# Setup for autotrust.
+
+if [ $AUTOTRUST -eq 1 ]; then
+	if [ -f $DEFTRUST ] && [ -f $DEFTARGS ]; then
+		OB_TARGS=$DEFTARGS
+		IB_TARGS=$DEFTRUST
+	else 
+		echo "Make sure $DEFTRUST and $DEFTARGS exist."
+	fi
+fi
 
 # While these are technically incompatible with any other options,
 # we only care if they are issued with each other. We'll ignore
@@ -282,12 +302,18 @@ if [ -z $OB_TARGS ]; then
 		$IPTABLES -I OUTPUT 1 -p udp -m multiport --dports $OB_UDP -j ACCEPT
 	fi
 else
-	cat $OB_TARGS | sed 's/#.*//' | egrep -o "(^|[^0-9.])((25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])(/[0-9][0-9]?)?($|[^0-9.])" | while read net; do
+	if [ $AUTOTRUST -eq 1 ]; then
+		cat $OB_TARGS $IB_TARGS
+	else
+		cat $OB_TARGS
+	fi | sed 's/#.*//' | egrep -o "(^|[^0-9.])((25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])(/[0-9][0-9]?)?($|[^0-9.])" | while read net; do
 		if [ -z $OB_TCP ]; then
 			if [ $PRINTSTATUS -eq 1 ]; then
 				echo "Limiting outbound TCP connections to $net."
 			fi
 			$IPTABLES -I OUTPUT 1 -d $net -p tcp -j ACCEPT
+			$IPTABLES -I OUTPUT 1 -d $net -p icmp --icmp-type 8 -j ACCEPT
+			$IPTABLES -I OUTPUT 1 -d $net -p icmp --icmp-type 0 -j ACCEPT
 		else
 			if [ $PRINTSTATUS -eq 1 ]; then
 				echo "Limiting outbound TCP connections to $net on ports $OB_TCP."
