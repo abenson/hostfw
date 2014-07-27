@@ -373,8 +373,10 @@ else
 
 		if [ -z $IB_TCP ]; then
 			if [ $PRINTSTATUS -eq 1 ]; then
-				echo "Not allowing inbound TCP connections."
+				#echo "Not allowing inbound TCP connections."
+				echo "Allowing inbound TCP connections from $net..."
 			fi
+			$IPTABLES -I INPUT 1 -s $net -p tcp -j ACCEPT
 		else
 			if [ $PRINTSTATUS -eq 1 ]; then
 				echo "Allowing inbound TCP connections from $net on ports $IB_TCP."
