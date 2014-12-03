@@ -307,13 +307,19 @@ else
 	else
 		cat $OB_TARGS
 	fi | sed 's/#.*//' | egrep -o "(^|[^0-9.])((25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])(/[0-9][0-9]?)?($|[^0-9.])" | while read net; do
+		if [ $ALLOWPING -eq 1 ]; then
+			if [ $PRINTSTATUS -eq 1 ]; then
+				echo "Allow ping/traceroute to $net..."
+			fi
+			$IPTABLES -I OUTPUT 1 -d $net -p icmp --icmp-type 8 -j ACCEPT
+			$IPTABLES -I OUTPUT 1 -d $net -p icmp --icmp-type 0 -j ACCEPT
+		fi
+
 		if [ -z $OB_TCP ]; then
 			if [ $PRINTSTATUS -eq 1 ]; then
 				echo "Limiting outbound TCP connections to $net."
 			fi
 			$IPTABLES -I OUTPUT 1 -d $net -p tcp -j ACCEPT
-			$IPTABLES -I OUTPUT 1 -d $net -p icmp --icmp-type 8 -j ACCEPT
-			$IPTABLES -I OUTPUT 1 -d $net -p icmp --icmp-type 0 -j ACCEPT
 		else
 			if [ $PRINTSTATUS -eq 1 ]; then
 				echo "Limiting outbound TCP connections to $net on ports $OB_TCP."
