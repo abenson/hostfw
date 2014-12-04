@@ -157,6 +157,9 @@ while [ ! -z "$1" ]; do
 			IPTABLES="echo $IPTABLES" ;;
 		"-q" )
 			PRINTSTATUS="0" ;;
+		* )
+			echo "Unknown option: $1"
+			help_and_quit ;;
 	esac
 	shift
 done
