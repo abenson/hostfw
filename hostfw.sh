@@ -410,8 +410,8 @@ fi
 if [ $PRINTSTATUS -eq 1 ]; then
 	echo "Allowing traffic for localhost."
 fi
-$IPTABLES -I INPUT 1 -s 127.0.0.1/8 -d 127.0.0.1 -j ACCEPT
-$IPTABLES -I OUTPUT 1 -s 127.0.0.1/8 -d 127.0.0.1 -j ACCEPT
+$IPTABLES -I INPUT 1 -s 127.0.0.1/8 -d 127.0.0.1/8 -j ACCEPT
+$IPTABLES -I OUTPUT 1 -s 127.0.0.1/8 -d 127.0.0.1/8 -j ACCEPT
 
 # If requested so the rules just created.
 if [ $SHOWRULES -eq 1 ]; then
