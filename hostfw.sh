@@ -282,6 +282,11 @@ $IPTABLES -I INPUT 1 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 $IPTABLES -I OUTPUT 1 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 
 if [ -z $OB_TARGS ]; then
+	if [ $PRINTSTATUS -eq 1 ]; then
+		echo "Allowing outbound ICMP..."
+	fi
+	$IPTABLES -I OUTPUT 1 -p icmp --icmp-type 8 -j ACCEPT
+	$IPTABLES -I OUTPUT 1 -p icmp --icmp-type 0 -j ACCEPT
 	if [ -z $OB_TCP ]; then
 		if [ $PRINTSTATUS -eq 1 ]; then
 			echo "Not limiting outbound TCP connections."
