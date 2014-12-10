@@ -225,7 +225,7 @@ if [ $DENYALL -eq 1 ]; then
 	fi
 	flush_rules
 	if [ $PRINTSTATUS -eq 1 ]; then
-		echo "Allowing all..."
+		echo "Disallowing all..."
 	fi
 	set_policy 'DROP'
 	exit
