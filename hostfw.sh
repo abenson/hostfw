@@ -251,9 +251,9 @@ if [ $LOGEXCEPT -eq 1 ]; then
 		if [ $PRINTSTATUS -eq 1 ]; then
 			echo "Logging exceptions..."
 		fi
-		$IPTABLES -A INPUT -j $logger
-		$IPTABLES -A OUTPUT -j $logger
-		$IPTABLES -A FORWARD -j $logger
+		$IPTABLES -A INPUT -m limit --limit 5/min -j $logger
+		$IPTABLES -A OUTPUT -m limit --limit 5/min -j $logger
+		$IPTABLES -A FORWARD -m limit --limit 5/min -j $logger
 	fi
 fi
 
