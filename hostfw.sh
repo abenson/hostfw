@@ -70,6 +70,9 @@ fi
 version_and_quit()
 {
 	echo "`basename $0` v$VERSION; Copyright (c) 2015, Andrew C. Benson"
+	echo
+	echo You can find more information, leave feedback and feature requests, and
+	echo find the latest version at the project page: http://github.com/abenson/hostfw
 	exit
 }
 
@@ -119,6 +122,9 @@ Defaults:
 Notes:
 
 	Combine -q and -s to generate a script.
+
+You can find more information, leave feedback and feature requests, and
+find the latest version at the project page: http://github.com/abenson/hostfw
 
 HELPMSG
 	exit
