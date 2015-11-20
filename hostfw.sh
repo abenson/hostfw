@@ -69,13 +69,13 @@ fi
 
 version_and_quit()
 {
-	echo "$0 v$VERSION; Copyright (c) 2015, Andrew C. Benson"
+	echo "`basename $0` v$VERSION; Copyright (c) 2015, Andrew C. Benson"
 	exit
 }
 
 help_and_quit()
 {
-	echo "usage: $0 <options>"
+	echo "usage: `basename $0` <options>"
 cat <<HELPMSG
 	-h                 This message.
 
