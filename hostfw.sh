@@ -28,6 +28,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+VERSION="0.4"
 
 # Simple host-based permit-by-exception iptables generation script.
 
@@ -66,11 +67,19 @@ if [ -z $IPTABLES ]; then
 	exit
 fi
 
+version_and_quit()
+{
+	echo "hostfw v$VERSION; Copyright (c) 2015, Andrew C. Benson"
+	exit
+}
+
 help_and_quit()
 {
 	echo "usage: $0 <options>"
 cat <<HELPMSG
 	-h                 This message.
+	
+	-v                 Display version.   
 
 	-r                 Send TCP RST instead of dropping packet.
 
@@ -119,6 +128,8 @@ while [ ! -z "$1" ]; do
 	case "$1" in
 		"-h" )
 			help_and_quit ;;
+		"-v" )
+			version_and_quit ;;
 		"-S" )
 			SHOWRULES="1" ;;
 		"-l" )
