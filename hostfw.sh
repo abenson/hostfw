@@ -69,7 +69,7 @@ fi
 
 version_and_quit()
 {
-	echo "hostfw v$VERSION; Copyright (c) 2015, Andrew C. Benson"
+	echo "$0 v$VERSION; Copyright (c) 2015, Andrew C. Benson"
 	exit
 }
 
