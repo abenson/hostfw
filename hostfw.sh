@@ -194,29 +194,12 @@ set_policy()
 log_exceptions()
 {
 	if [ $LOGEXCEPT -eq 1 ]; then
-		logger=""
-		lsmod | grep -q "ipt_LOG"
-		if [ $? -eq 0 ]; then
-			logger="LOG"
+		if [ $PRINTSTATUS -eq 1 ]; then
+			echo "Logging exceptions..."
 		fi
-		lsmod | grep -q "xt_LOG"
-		if [ $? -eq 0 ]; then
-			logger="LOG"
-		fi
-		lsmod | grep -q "ipt_ULOG"
-		if [ $? -eq 0 ]; then
-			logger="ULOG"
-		fi
-		if [ -z $logger ]; then
-			echo "Will not log; Please configure a valid logging method."
-		else
-			if [ $PRINTSTATUS -eq 1 ]; then
-				echo "Logging exceptions..."
-			fi
-			$IPTABLES -A INPUT -m limit --limit 5/min -j $logger
-			$IPTABLES -A OUTPUT -m limit --limit 5/min -j $logger
-			$IPTABLES -A FORWARD -m limit --limit 5/min -j $logger
-		fi
+		$IPTABLES -A INPUT -m limit --limit 5/min -j LOG
+		$IPTABLES -A OUTPUT -m limit --limit 5/min -j LOG
+		$IPTABLES -A FORWARD -m limit --limit 5/min -j LOG
 	fi
 }
 
