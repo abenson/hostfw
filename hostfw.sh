@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (c) 2014, Andrew C. Benson
+# Copyright (c) 2015, Andrew C. Benson
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without
@@ -180,6 +180,30 @@ set_policy()
 	$IPTABLES -P FORWARD $1
 }
 
+log_exceptions()
+{
+	if [ $LOGEXCEPT -eq 1 ]; then
+		logger=""
+		lsmod | grep -q "ipt_LOG"
+		if [ $? -eq 0 ]; then
+			logger="LOG"
+		fi
+		lsmod | grep -q "ipt_ULOG"
+		if [ $? -eq 0 ]; then
+			logger="ULOG"
+		fi
+		if [ -z $logger ]; then
+			echo "Will not log; Please configure a valid logging method."
+		else
+			if [ $PRINTSTATUS -eq 1 ]; then
+				echo "Logging exceptions..."
+			fi
+			$IPTABLES -A INPUT -m limit --limit 5/min -j $logger
+			$IPTABLES -A OUTPUT -m limit --limit 5/min -j $logger
+			$IPTABLES -A FORWARD -m limit --limit 5/min -j $logger
+		fi
+	fi
+}
 
 # Setup for autotrust.
 
@@ -228,6 +252,7 @@ if [ $DENYALL -eq 1 ]; then
 		echo "Disallowing all..."
 	fi
 	set_policy 'DROP'
+	log_exceptions
 	exit
 fi
 
@@ -235,27 +260,7 @@ fi
 flush_rules
 set_policy 'DROP'
 
-if [ $LOGEXCEPT -eq 1 ]; then
-	logger=""
-	lsmod | grep -q "ipt_LOG"
-	if [ $? -eq 0 ]; then
-		logger="LOG"
-	fi
-	lsmod | grep -q "ipt_ULOG"
-	if [ $? -eq 0 ]; then
-		logger="ULOG"
-	fi
-	if [ -z $logger ]; then
-		echo "Will not log; Please configure a valid logging method."
-	else
-		if [ $PRINTSTATUS -eq 1 ]; then
-			echo "Logging exceptions..."
-		fi
-		$IPTABLES -A INPUT -m limit --limit 5/min -j $logger
-		$IPTABLES -A OUTPUT -m limit --limit 5/min -j $logger
-		$IPTABLES -A FORWARD -m limit --limit 5/min -j $logger
-	fi
-fi
+log_exceptions
 
 if [ $RESETCONN -eq 1 ]; then
 	if [ $PRINTSTATUS -eq 1 ]; then
