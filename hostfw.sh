@@ -193,14 +193,9 @@ set_policy()
 
 log_exceptions()
 {
-	if [ $LOGEXCEPT -eq 1 ]; then
-		if [ $PRINTSTATUS -eq 1 ]; then
-			echo "Logging exceptions..."
-		fi
-		$IPTABLES -A INPUT -m limit --limit 5/min -j LOG
-		$IPTABLES -A OUTPUT -m limit --limit 5/min -j LOG
-		$IPTABLES -A FORWARD -m limit --limit 5/min -j LOG
-	fi
+	$IPTABLES -A INPUT -m limit --limit 5/min -j LOG
+	$IPTABLES -A OUTPUT -m limit --limit 5/min -j LOG
+	$IPTABLES -A FORWARD -m limit --limit 5/min -j LOG
 }
 
 # Setup for autotrust.
@@ -250,7 +245,12 @@ if [ $DENYALL -eq 1 ]; then
 		echo "Disallowing all..."
 	fi
 	set_policy 'DROP'
-	log_exceptions
+	if [ $LOGEXCEPT -eq 1 ]; then
+		if [ $PRINTSTATUS -eq 1 ]; then
+			echo "Logging exceptions..."
+		fi
+		log_exceptions
+	fi
 	exit
 fi
 
@@ -258,7 +258,12 @@ fi
 flush_rules
 set_policy 'DROP'
 
-log_exceptions
+if [ $LOGEXCEPT -eq 1 ]; then
+	if [ $PRINTSTATUS -eq 1 ]; then
+		echo "Logging exceptions..."
+	fi
+	log_exceptions
+fi
 
 if [ $RESETCONN -eq 1 ]; then
 	if [ $PRINTSTATUS -eq 1 ]; then
