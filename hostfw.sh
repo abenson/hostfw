@@ -188,6 +188,10 @@ log_exceptions()
 		if [ $? -eq 0 ]; then
 			logger="LOG"
 		fi
+		lsmod | grep -q "xt_LOG"
+		if [ $? -eq 0 ]; then
+			logger="LOG"
+		fi
 		lsmod | grep -q "ipt_ULOG"
 		if [ $? -eq 0 ]; then
 			logger="ULOG"
