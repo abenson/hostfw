@@ -2,10 +2,10 @@
 
 # Copyright (c) 2015, Andrew C. Benson
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
+#
 #     * Redistributions of source code must retain the above copyright
 #       notice, this list of conditions and the following disclaimer.
 #
@@ -13,10 +13,10 @@
 #       notice, this list of conditions and the following disclaimer in the
 #       documentation and/or other materials provided with the distribution.
 
-#     * Neither the name of `hostfw` nor the names of its contributors may 
-#       be used to endorse or promote products derived from this software 
+#     * Neither the name of `hostfw` nor the names of its contributors may
+#       be used to endorse or promote products derived from this software
 #       without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -59,7 +59,7 @@ fi
 
 IPTABLES=`which iptables 2>/dev/null`
 
-# We want to make sure iptables is available before we attempt to create 
+# We want to make sure iptables is available before we attempt to create
 # the rules.
 
 if [ -z $IPTABLES ]; then
@@ -78,8 +78,8 @@ help_and_quit()
 	echo "usage: $0 <options>"
 cat <<HELPMSG
 	-h                 This message.
-	
-	-v                 Display version.   
+
+	-v                 Display version.
 
 	-r                 Send TCP RST instead of dropping packet.
 
@@ -87,7 +87,7 @@ cat <<HELPMSG
 
 	-d                 Disallow DHCP.
 
-	-tt                Automatically set rules based on /etc/trusted.hosts 
+	-tt                Automatically set rules based on /etc/trusted.hosts
                            and /etc/target.hosts
 
 	-ot <...>          Comma separated list of allowed TCP ports outbound.
@@ -124,7 +124,7 @@ HELPMSG
 	exit
 }
 
-while [ ! -z "$1" ]; do 
+while [ ! -z "$1" ]; do
 	case "$1" in
 		"-h" )
 			help_and_quit ;;
@@ -141,7 +141,7 @@ while [ ! -z "$1" ]; do
 		"-d" )
 			ALLOWDHCP="0" ;;
 		"-ot" )
-			OB_TCP="$2" 
+			OB_TCP="$2"
 			shift ;;
 		"-ou" )
 			OB_UDP="$2"
@@ -175,15 +175,15 @@ while [ ! -z "$1" ]; do
 	shift
 done
 
-# Handy wrapper to clear the rules. 
+# Handy wrapper to clear the rules.
 flush_rules()
 {
 	$IPTABLES -F INPUT
 	$IPTABLES -F OUTPUT
 	$IPTABLES -F FORWARD
-} 
+}
 
-# Handy wrapper to set the policy of each chain. 
+# Handy wrapper to set the policy of each chain.
 set_policy()
 {
 	$IPTABLES -P INPUT $1
@@ -204,7 +204,7 @@ if [ $AUTOTRUST -eq 1 ]; then
 	if [ -f $DEFTRUST ] && [ -f $DEFTARGS ]; then
 		OB_TARGS=$DEFTARGS
 		IB_TARGS=$DEFTRUST
-	else 
+	else
 		echo "Make sure $DEFTRUST and $DEFTARGS exist."
 	fi
 fi
@@ -214,12 +214,12 @@ fi
 # the other options, but we won't know what to do with both of these.
 
 if [ $ALLOWALL -eq 1 ] && [ $DENYALL -eq 1 ]; then
-	echo "-A and -D are incompatible." 
+	echo "-A and -D are incompatible."
 	echo
 	help_and_quit
 fi
 
-# Formula is the same for each of these. 
+# Formula is the same for each of these.
 # 1. Clear all rules.
 # 2. Set default policy.
 # 3. Don't do anything else.
@@ -405,7 +405,7 @@ else
 			fi
 			$IPTABLES -I INPUT 1 -s $net -p tcp -m multiport --dports $IB_TCP -j ACCEPT
 		fi
-		
+
 		if [ -z $IB_UDP ]; then
 			if [ $PRINTSTATUS -eq 1 ]; then
 				echo "Not allowing inbound UDP connections."
