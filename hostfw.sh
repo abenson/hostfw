@@ -79,54 +79,54 @@ version_and_quit()
 help_and_quit()
 {
 	echo "usage: `basename $0` <options>"
-cat <<HELPMSG
-	-h                 This message.
+	cat <<-HELPMSG
+	    -h                 This message.
 
-	-v                 Display version.
+	    -v                 Display version.
 
-	-r                 Send TCP RST instead of dropping packet.
+	    -r                 Send TCP RST instead of dropping packet.
 
-	-p                 Disallow incoming PING
+	    -p                 Disallow incoming PING
 
-	-d                 Disallow DHCP.
+	    -d                 Disallow DHCP.
 
-	-tt                Automatically set rules based on /etc/trusted.hosts
+	    -tt                Automatically set rules based on /etc/trusted.hosts
                            and /etc/target.hosts
 
-	-ot <...>          Comma separated list of allowed TCP ports outbound.
-	-ou <...>          Comma separated list of allowed UDP ports outbound.
+	    -ot <...>          Comma separated list of allowed TCP ports outbound.
+	    -ou <...>          Comma separated list of allowed UDP ports outbound.
 
-	-it <...>          Comma separated list of allowed TCP ports inbound.
-	-iu <...>          Comma separated list of allowed UDP ports inbound.
+	    -it <...>          Comma separated list of allowed TCP ports inbound.
+	    -iu <...>          Comma separated list of allowed UDP ports inbound.
 
-	-oh <targs.lst>    Restrict outbound to specified hosts.
-	-ih <trust.lst>    Restrict inbound to specified hosts.
+	    -oh <targs.lst>    Restrict outbound to specified hosts.
+	    -ih <trust.lst>    Restrict inbound to specified hosts.
 
-	-l                 Log exceptions.
+	    -l                 Log exceptions.
 
-        -s                 Simulate only.
-        -q                 Quiet (don't display status messages)
+	    -s                 Simulate only.
+	    -q                 Quiet (don't display status messages)
 
-	-D                 Absolute deny all.
-	-A                 Absolute allow all.
+	    -D                 Absolute deny all.
+	    -A                 Absolute allow all.
 
-	-S                 Show rules after setting.
+	    -S                 Show rules after setting.
 
-Defaults:
-	Outbound connections will be allowed on all ports to all hosts.
-	Inbound connections will be limited to related outbound traffic.
-	DHCP will be enabled.
-	Ping responses will be enabled.
-	Unsolicited inbound connections will be dropped.
+	Defaults:
+	    Outbound connections will be allowed on all ports to all hosts.
+	    Inbound connections will be limited to related outbound traffic.
+	    DHCP will be enabled.
+	    Ping responses will be enabled.
+	    Unsolicited inbound connections will be dropped.
 
-Notes:
+	Notes:
 
-	Combine -q and -s to generate a script.
+	    Combine -q and -s to generate a script.
 
-You can find more information, leave feedback and feature requests, and
-find the latest version at the project page: http://github.com/abenson/hostfw
+	You can find more information, leave feedback and feature requests, and
+	find the latest version at the project page: http://github.com/abenson/hostfw
 
-HELPMSG
+	HELPMSG
 	exit
 }
 
