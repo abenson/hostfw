@@ -28,7 +28,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-VERSION="0.4.1"
+VERSION="0.4.2"
 
 # Simple host-based permit-by-exception iptables generation script.
 
@@ -204,6 +204,15 @@ log_exceptions()
 	$IPTABLES -A FORWARD -m limit --limit 5/min -j LOG
 }
 
+allow_localhost()
+{
+	if [ $PRINTSTATUS -eq 1 ]; then
+		echo "Allowing traffic for localhost."
+	fi
+	$IPTABLES -I INPUT 1 -s 127.0.0.1/8 -d 127.0.0.1/8 -j ACCEPT
+	$IPTABLES -I OUTPUT 1 -s 127.0.0.1/8 -d 127.0.0.1/8 -j ACCEPT
+}
+
 # Setup for autotrust.
 
 if [ $AUTOTRUST -eq 1 ]; then
@@ -251,6 +260,7 @@ if [ $DENYALL -eq 1 ]; then
 		echo "Disallowing all..."
 	fi
 	set_policy 'DROP'
+	allow_localhost
 	if [ $LOGEXCEPT -eq 1 ]; then
 		if [ $PRINTSTATUS -eq 1 ]; then
 			echo "Logging exceptions..."
@@ -425,12 +435,7 @@ else
 	done
 fi
 
-# Allow localhost traffic.
-if [ $PRINTSTATUS -eq 1 ]; then
-	echo "Allowing traffic for localhost."
-fi
-$IPTABLES -I INPUT 1 -s 127.0.0.1/8 -d 127.0.0.1/8 -j ACCEPT
-$IPTABLES -I OUTPUT 1 -s 127.0.0.1/8 -d 127.0.0.1/8 -j ACCEPT
+allow_localhost
 
 # If requested so the rules just created.
 if [ $SHOWRULES -eq 1 ]; then
