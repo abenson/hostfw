@@ -304,7 +304,6 @@ if [ $RESETCONN -eq 1 ]; then
 fi
 
 if [ -n "$EX_TARGS" ]; then
-	echo "DEBUG: Setting exclude targs to '$EX_TARGS'."
 	cat $EX_TARGS | sed 's/#.*//' | egrep -o "(^|[^0-9.])((25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])(/[0-9][0-9]?)?($|[^0-9.])" | while read net; do
 		$IPTABLES -I INPUT 1 -s $net -j DROP
 		$IPTABLES -I OUTPUT 1 -d $net -j DROP
