@@ -43,6 +43,7 @@ IB_TCP=""
 IB_UDP=""
 OB_TARGS=""
 IB_TARGS=""
+EX_TARGS=""
 AUTOTRUST="0"
 ALLOWALL="0"
 DENYALL="0"
@@ -50,6 +51,7 @@ SHOWRULES="0"
 PRINTSTATUS="1"
 DEFTRUST="/etc/trusted.hosts"
 DEFTARGS="/etc/target.hosts"
+DEFEXCLD="/etc/exclude.hosts"
 
 # You must be root (uid=0) to set iptables rules.
 if [ `id -u` != "0" ]; then
@@ -101,6 +103,8 @@ help_and_quit()
 
 	    -oh <targs.lst>    Restrict outbound to specified hosts.
 	    -ih <trust.lst>    Restrict inbound to specified hosts.
+
+	    -eh <excld.lst>    Exclude hosts, even if they are in targets/trusted.
 
 	    -l                 Log exceptions.
 
@@ -164,6 +168,9 @@ while [ ! -z "$1" ]; do
 		"-ih" )
 			IB_TARGS="$2"
 			shift ;;
+		"-eh" )
+			EX_TARGS="$2"
+			shift ;;
 		"-D" )
 			DENYALL="1" ;;
 		"-A" )
@@ -219,6 +226,9 @@ if [ $AUTOTRUST -eq 1 ]; then
 	if [ -f $DEFTRUST ] && [ -f $DEFTARGS ]; then
 		OB_TARGS=$DEFTARGS
 		IB_TARGS=$DEFTRUST
+		if [ -f $DEFEXCLD ]; then
+			EX_TARGS=$DEFEXCLD
+		fi
 	else
 		echo "Make sure $DEFTRUST and $DEFTARGS exist."
 	fi
@@ -288,6 +298,14 @@ if [ $RESETCONN -eq 1 ]; then
 	$IPTABLES -A INPUT -j REJECT
 	$IPTABLES -A OUTPUT -j REJECT
 	$IPTABLES -A FORWARD -j REJECT
+fi
+
+if [ -n "$EX_TARGS" ]; then
+	echo "DEBUG: Setting exclude targs to '$EX_TARGS'."
+	cat $EX_TARGS | sed 's/#.*//' | egrep -o "(^|[^0-9.])((25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])(/[0-9][0-9]?)?($|[^0-9.])" | while read net; do
+		$IPTABLES -I INPUT 1 -s $net -j DROP
+		$IPTABLES -I OUTPUT 1 -d $net -j DROP
+	done
 fi
 
 if [ $ALLOWDHCP -eq 1 ]; then
