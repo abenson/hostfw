@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (c) 2015, Andrew C. Benson
+# Copyright (c) 2016, Andrew C. Benson
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-VERSION="0.4.2"
+VERSION="0.5.0"
 
 # Simple host-based permit-by-exception iptables generation script.
 
@@ -72,7 +72,7 @@ fi
 
 version_and_quit()
 {
-	echo "`basename $0` v$VERSION; Copyright (c) 2015, Andrew C. Benson"
+	echo "`basename $0` v$VERSION; Copyright (c) 2016, Andrew C. Benson"
 	echo
 	echo You can find more information, leave feedback and feature requests, and
 	echo find the latest version at the project page: http://github.com/abenson/hostfw
