@@ -37,6 +37,7 @@ LOGEXCEPT="0"
 RESETCONN="0"
 ALLOWPING="1"
 ALLOWDHCP="1"
+ALLICMP="0"
 OB_TCP=""
 OB_UDP=""
 IB_TCP=""
@@ -89,7 +90,7 @@ help_and_quit()
 	    -r                 Send TCP RST instead of dropping packet.
 
 	    -p                 Disallow incoming PING
-
+	    -i                 Don't restrict ICMP types.
 	    -d                 Disallow DHCP.
 
 	    -tt                Automatically set rules based on /etc/trusted.hosts
@@ -148,6 +149,8 @@ while [ ! -z "$1" ]; do
 			RESETCONN="1";;
 		"-p" )
 			ALLOWPING="0" ;;
+		"-i" )
+			ALLICMP="1" ;;
 		"-d" )
 			ALLOWDHCP="0" ;;
 		"-ot" )
@@ -327,8 +330,12 @@ if [ -z $OB_TARGS ]; then
 	if [ $PRINTSTATUS -eq 1 ]; then
 		echo "Allowing outbound ICMP..."
 	fi
-	$IPTABLES -I OUTPUT 1 -p icmp --icmp-type 8 -j ACCEPT
-	$IPTABLES -I OUTPUT 1 -p icmp --icmp-type 0 -j ACCEPT
+	if [ $ALLICMP -eq 0 ]; then
+		$IPTABLES -I OUTPUT 1 -p icmp --icmp-type 8 -j ACCEPT
+		$IPTABLES -I OUTPUT 1 -p icmp --icmp-type 0 -j ACCEPT
+	else
+		$IPTABLES -I OUTPUT 1 -p icmp -j ACCEPT
+	fi
 	if [ -z $OB_TCP ]; then
 		if [ $PRINTSTATUS -eq 1 ]; then
 			echo "Not limiting outbound TCP connections."
@@ -361,8 +368,12 @@ else
 			if [ $PRINTSTATUS -eq 1 ]; then
 				echo "Allow ping/traceroute to $net..."
 			fi
-			$IPTABLES -I OUTPUT 1 -d $net -p icmp --icmp-type 8 -j ACCEPT
-			$IPTABLES -I OUTPUT 1 -d $net -p icmp --icmp-type 0 -j ACCEPT
+			if [ $ALLICMP -eq 0 ]; then
+				$IPTABLES -I OUTPUT 1 -d $net -p icmp --icmp-type 8 -j ACCEPT
+				$IPTABLES -I OUTPUT 1 -d $net -p icmp --icmp-type 0 -j ACCEPT
+			else
+				$IPTABLES -I OUTPUT 1 -d $net -p icmp -j ACCEPT
+			fi
 		fi
 
 		if [ -z $OB_TCP ]; then
@@ -395,7 +406,11 @@ if [ -z $IB_TARGS ]; then
 		if [ $PRINTSTATUS -eq 1 ]; then
 			echo "Respond to pings..."
 		fi
-		$IPTABLES -I INPUT 1 -p icmp --icmp-type 8 -j ACCEPT
+		if [ $ALLICMP -eq 0 ]; then
+			$IPTABLES -I INPUT 1 -p icmp --icmp-type 8 -j ACCEPT
+		else
+			$IPTABLES -I INPUT 1 -p icmp -j ACCEPT
+		fi
 	fi
 
 	if [ -z $IB_TCP ]; then
@@ -424,7 +439,11 @@ else
 			if [ $PRINTSTATUS -eq 1 ]; then
 				echo "Respond to pings from $net..."
 			fi
-			$IPTABLES -I INPUT 1 -s $net -p icmp --icmp-type 8 -j ACCEPT
+			if [ $ALLICMP -eq 0 ]; then
+				$IPTABLES -I INPUT 1 -s $net -p icmp --icmp-type 8 -j ACCEPT
+			else
+				$IPTABLES -I INTUT 1 -s $net -p icmp -j ACCEPT
+			fi
 		fi
 
 		if [ -z $IB_TCP ]; then
