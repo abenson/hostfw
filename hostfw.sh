@@ -303,12 +303,6 @@ if [ $RESETCONN -eq 1 ]; then
 	$IPTABLES -A FORWARD -j REJECT
 fi
 
-if [ -n "$EX_TARGS" ]; then
-	cat $EX_TARGS | sed 's/#.*//' | egrep -o "(^|[^0-9.])((25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])(/[0-9][0-9]?)?($|[^0-9.])" | while read net; do
-		$IPTABLES -I INPUT 1 -s $net -j DROP
-		$IPTABLES -I OUTPUT 1 -d $net -j DROP
-	done
-fi
 
 if [ $ALLOWDHCP -eq 1 ]; then
 	if [ $PRINTSTATUS -eq 1 ]; then
@@ -468,6 +462,13 @@ else
 			fi
 			$IPTABLES -I INPUT 1 -s $net -p udp -m multiport --dports $IB_UDP -j ACCEPT
 		fi
+	done
+fi
+
+if [ -n "$EX_TARGS" ]; then
+	cat $EX_TARGS | sed 's/#.*//' | egrep -o "(^|[^0-9.])((25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])(/[0-9][0-9]?)?($|[^0-9.])" | while read net; do
+		$IPTABLES -I INPUT 1 -s $net -j DROP
+		$IPTABLES -I OUTPUT 1 -d $net -j DROP
 	done
 fi
 
