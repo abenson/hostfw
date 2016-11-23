@@ -14,6 +14,6 @@ firewall.1.gz: firewall.1
 	gzip -f -c firewall.1 > firewall.1.gz
 
 install:
-	/usr/bin/install -g root -u root -m 0755 -p firewall $(PREFIX)/firewall
-	/usr/bin/install -g root -u root -m 0644 -p install.1.gz $(MANPREFIX)/man8/firewall.1.gz
+	/usr/bin/install -g root -o root -m 0755 -p firewall $(PREFIX)/firewall
+	/usr/bin/install -g root -o root -m 0644 -p firewall.1.gz $(MANPREFIX)/man1/firewall.1.gz
 
