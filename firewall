@@ -206,6 +206,9 @@ fi
 # Handy wrapper to clear the rules.
 flush_rules()
 {
+	if [ -n "$PRINTCMD" ]; then
+		$PRINTCMD "Flushing existing rules..."
+	fi
 	$IPTABLES -F INPUT
 	$IPTABLES -F OUTPUT
 	$IPTABLES -F FORWARD
@@ -214,6 +217,9 @@ flush_rules()
 # Handy wrapper to set the policy of each chain.
 set_policy()
 {
+	if [ -n "$PRINTCMD" ]; then
+		$PRINTCMD "Setting default policy to $1..."
+	fi
 	$IPTABLES -P INPUT $1
 	$IPTABLES -P OUTPUT $1
 	$IPTABLES -P FORWARD $1
@@ -221,6 +227,9 @@ set_policy()
 
 log_exceptions()
 {
+	if [ -n "$PRINTCMD" ]; then
+		$PRINTCMD "Logging exceptions..."
+	fi
 	$IPTABLES -A INPUT -m limit --limit 5/min -j LOG
 	$IPTABLES -A OUTPUT -m limit --limit 5/min -j LOG
 	$IPTABLES -A FORWARD -m limit --limit 5/min -j LOG
@@ -265,9 +274,6 @@ fi
 # 3. Don't do anything else.
 
 if [ $ALLOWALL -eq 1 ]; then
-	if [ -n "$PRINTCMD" ]; then
-		$PRINTCMD "Flushing rules..."
-	fi
 	flush_rules
 	if [ -n "$PRINTCMD" ]; then
 		$PRINTCMD "Allowing all..."
@@ -277,9 +283,6 @@ if [ $ALLOWALL -eq 1 ]; then
 fi
 
 if [ $DENYALL -eq 1 ]; then
-	if [ -n "$PRINTCMD" ]; then
-		$PRINTCMD "Flushing rules..."
-	fi
 	flush_rules
 	if [ -n "$PRINTCMD" ]; then
 		$PRINTCMD "Disallowing all..."
@@ -287,9 +290,6 @@ if [ $DENYALL -eq 1 ]; then
 	set_policy 'DROP'
 	allow_localhost
 	if [ $LOGEXCEPT -eq 1 ]; then
-		if [ -n "$PRINTCMD" ]; then
-			$PRINTCMD "Logging exceptions..."
-		fi
 		log_exceptions
 	fi
 	exit
@@ -300,9 +300,6 @@ flush_rules
 set_policy 'DROP'
 
 if [ $LOGEXCEPT -eq 1 ]; then
-	if [ -n "$PRINTCMD" ]; then
-		$PRINTCMD "Logging exceptions..."
-	fi
 	log_exceptions
 fi
 
