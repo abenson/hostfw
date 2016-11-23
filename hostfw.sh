@@ -54,33 +54,24 @@ DEFTRUST="/etc/trusted.hosts"
 DEFTARGS="/etc/target.hosts"
 DEFEXCLD="/etc/exclude.hosts"
 
-# You must be root (uid=0) to set iptables rules.
-if [ `id -u` != "0" ]; then
-	echo "You must be root to run this command."
-	exit
-fi
-
-IPTABLES=`which iptables 2>/dev/null`
-
-# We want to make sure iptables is available before we attempt to create
-# the rules.
-
-if [ -z $IPTABLES ]; then
-	echo "Unable to find \`iptables\` in path."
-	exit
-fi
-
-version_and_quit()
+version()
 {
 	echo "`basename $0` v$VERSION; Copyright (c) 2016, Andrew C. Benson"
 	echo
 	echo You can find more information, leave feedback and feature requests, and
 	echo find the latest version at the project page: http://github.com/abenson/hostfw
+	echo
+}
+
+version_and_quit()
+{
+	version
 	exit
 }
 
 help_and_quit()
 {
+	version
 	echo "usage: `basename $0` <options>"
 	cat <<-HELPMSG
 	    -h                 This message.
@@ -134,6 +125,23 @@ help_and_quit()
 	HELPMSG
 	exit
 }
+
+# You must be root (uid=0) to set iptables rules.
+if [ `id -u` != "0" ]; then
+	echo "You must be root to run this command."
+	echo
+	help_and_quit
+fi
+
+IPTABLES=`which iptables 2>/dev/null`
+
+# We want to make sure iptables is available before we attempt to create
+# the rules.
+
+if [ -z $IPTABLES ]; then
+	echo "Unable to find \`iptables\` in path."
+	exit
+fi
 
 while [ ! -z "$1" ]; do
 	case "$1" in
