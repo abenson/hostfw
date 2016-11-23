@@ -50,9 +50,12 @@ ALLOWALL="0"
 DENYALL="0"
 SHOWRULES="0"
 PRINTCMD="echo "
+SCRIPTGEN="0"
 DEFTRUST="/etc/trusted.hosts"
 DEFTARGS="/etc/target.hosts"
 DEFEXCLD="/etc/exclude.hosts"
+
+IPTABLES=`which iptables 2>/dev/null`
 
 version()
 {
@@ -126,23 +129,6 @@ help_and_quit()
 	exit
 }
 
-# You must be root (uid=0) to set iptables rules.
-if [ `id -u` != "0" ]; then
-	echo "You must be root to run this command."
-	echo
-	help_and_quit
-fi
-
-IPTABLES=`which iptables 2>/dev/null`
-
-# We want to make sure iptables is available before we attempt to create
-# the rules.
-
-if [ -z $IPTABLES ]; then
-	echo "Unable to find \`iptables\` in path."
-	exit
-fi
-
 while [ ! -z "$1" ]; do
 	case "$1" in
 		"-h" )
@@ -189,7 +175,8 @@ while [ ! -z "$1" ]; do
 		"-tt")
 			AUTOTRUST="1" ;;
 		"-s" )
-			IPTABLES="echo $IPTABLES"
+			SCRIPTGEN="1"
+			IPTABLES="echo /usr/bin/env iptables"
 			PRINTCMD="echo # " ;;
 		"-q" )
 			PRINTCMD="" ;;
@@ -199,6 +186,22 @@ while [ ! -z "$1" ]; do
 	esac
 	shift
 done
+
+# You must be root (uid=0) to set iptables rules.
+
+if [ `id -u` != "0" ] && [ "$SCRIPTGEN" -eq 0 ] ; then
+	echo "You must be root to run this command."
+	echo
+	help_and_quit
+fi
+
+# We want to make sure iptables is available before we attempt to create
+# the rules.
+
+if [ -z "$IPTABLES" ] && [ "$SCRIPTGEN" -eq 0 ] ; then
+	echo "Unable to find \`iptables\` in path."
+	exit
+fi
 
 # Handy wrapper to clear the rules.
 flush_rules()
