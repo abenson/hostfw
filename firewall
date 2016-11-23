@@ -49,7 +49,7 @@ AUTOTRUST="0"
 ALLOWALL="0"
 DENYALL="0"
 SHOWRULES="0"
-PRINTSTATUS="1"
+PRINTCMD="echo "
 DEFTRUST="/etc/trusted.hosts"
 DEFTARGS="/etc/target.hosts"
 DEFEXCLD="/etc/exclude.hosts"
@@ -189,9 +189,10 @@ while [ ! -z "$1" ]; do
 		"-tt")
 			AUTOTRUST="1" ;;
 		"-s" )
-			IPTABLES="echo $IPTABLES" ;;
+			IPTABLES="echo $IPTABLES"
+			PRINTCMD="echo # " ;;
 		"-q" )
-			PRINTSTATUS="0" ;;
+			PRINTCMD="" ;;
 		* )
 			echo "Unknown option: $1"
 			help_and_quit ;;
@@ -224,8 +225,8 @@ log_exceptions()
 
 allow_localhost()
 {
-	if [ $PRINTSTATUS -eq 1 ]; then
-		echo "Allowing traffic for localhost."
+	if [ -n "$PRINTCMD" ]; then
+		$PRINTCMD "Allowing traffic for localhost."
 	fi
 	$IPTABLES -I INPUT 1 -s 127.0.0.1/8 -d 127.0.0.1/8 -j ACCEPT
 	$IPTABLES -I OUTPUT 1 -s 127.0.0.1/8 -d 127.0.0.1/8 -j ACCEPT
@@ -241,7 +242,7 @@ if [ $AUTOTRUST -eq 1 ]; then
 			EX_TARGS=$DEFEXCLD
 		fi
 	else
-		echo "Make sure $DEFTRUST and $DEFTARGS exist."
+		$PRINTCMD "Make sure $DEFTRUST and $DEFTARGS exist."
 	fi
 fi
 
@@ -250,7 +251,7 @@ fi
 # the other options, but we won't know what to do with both of these.
 
 if [ $ALLOWALL -eq 1 ] && [ $DENYALL -eq 1 ]; then
-	echo "-A and -D are incompatible."
+	$PRINTCMD "-A and -D are incompatible."
 	echo
 	help_and_quit
 fi
@@ -261,30 +262,30 @@ fi
 # 3. Don't do anything else.
 
 if [ $ALLOWALL -eq 1 ]; then
-	if [ $PRINTSTATUS -eq 1 ]; then
-		echo "Flushing rules..."
+	if [ -n "$PRINTCMD" ]; then
+		$PRINTCMD "Flushing rules..."
 	fi
 	flush_rules
-	if [ $PRINTSTATUS -eq 1 ]; then
-		echo "Allowing all..."
+	if [ -n "$PRINTCMD" ]; then
+		$PRINTCMD "Allowing all..."
 	fi
 	set_policy 'ACCEPT'
 	exit
 fi
 
 if [ $DENYALL -eq 1 ]; then
-	if [ $PRINTSTATUS -eq 1 ]; then
-		echo "Flushing rules..."
+	if [ -n "$PRINTCMD" ]; then
+		$PRINTCMD "Flushing rules..."
 	fi
 	flush_rules
-	if [ $PRINTSTATUS -eq 1 ]; then
-		echo "Disallowing all..."
+	if [ -n "$PRINTCMD" ]; then
+		$PRINTCMD "Disallowing all..."
 	fi
 	set_policy 'DROP'
 	allow_localhost
 	if [ $LOGEXCEPT -eq 1 ]; then
-		if [ $PRINTSTATUS -eq 1 ]; then
-			echo "Logging exceptions..."
+		if [ -n "$PRINTCMD" ]; then
+			$PRINTCMD "Logging exceptions..."
 		fi
 		log_exceptions
 	fi
@@ -296,15 +297,15 @@ flush_rules
 set_policy 'DROP'
 
 if [ $LOGEXCEPT -eq 1 ]; then
-	if [ $PRINTSTATUS -eq 1 ]; then
-		echo "Logging exceptions..."
+	if [ -n "$PRINTCMD" ]; then
+		$PRINTCMD "Logging exceptions..."
 	fi
 	log_exceptions
 fi
 
 if [ $RESETCONN -eq 1 ]; then
-	if [ $PRINTSTATUS -eq 1 ]; then
-		echo "Send tcp-reset for unwanted connections..."
+	if [ -n "$PRINTCMD" ]; then
+		$PRINTCMD "Send tcp-reset for unwanted connections..."
 	fi
 	$IPTABLES -A INPUT -j REJECT
 	$IPTABLES -A OUTPUT -j REJECT
@@ -313,23 +314,23 @@ fi
 
 
 if [ $ALLOWDHCP -eq 1 ]; then
-	if [ $PRINTSTATUS -eq 1 ]; then
-		echo "Allowing DHCP..."
+	if [ -n "$PRINTCMD" ]; then
+		$PRINTCMD "Allowing DHCP..."
 	fi
 	$IPTABLES -I INPUT 1 -p udp --dport 67:68 --sport 67:68 -j ACCEPT
 	$IPTABLES -I OUTPUT 1 -p udp --dport 67:68 --sport 67:68 -j ACCEPT
 fi
 
 # Allow related connections.
-if [ $PRINTSTATUS -eq 1 ]; then
-	echo "Allowing related connections..."
+if [ -n "$PRINTCMD" ]; then
+	$PRINTCMD "Allowing related connections..."
 fi
 $IPTABLES -I INPUT 1 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 $IPTABLES -I OUTPUT 1 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 
 if [ -z $OB_TARGS ]; then
-	if [ $PRINTSTATUS -eq 1 ]; then
-		echo "Allowing outbound ICMP..."
+	if [ -n "$PRINTCMD" ]; then
+		 $PRINTCMD "Allowing outbound ICMP..."
 	fi
 	if [ $ALLICMP -eq 0 ]; then
 		$IPTABLES -I OUTPUT 1 -p icmp --icmp-type 8 -j ACCEPT
@@ -338,24 +339,24 @@ if [ -z $OB_TARGS ]; then
 		$IPTABLES -I OUTPUT 1 -p icmp -j ACCEPT
 	fi
 	if [ -z $OB_TCP ]; then
-		if [ $PRINTSTATUS -eq 1 ]; then
-			echo "Not limiting outbound TCP connections."
+		if [ -n "$PRINTCMD" ]; then
+			$PRINTCMD "Not limiting outbound TCP connections."
 		fi
 		$IPTABLES -I OUTPUT 1 -p tcp -j ACCEPT
 	else
-		if [ $PRINTSTATUS -eq 1 ]; then
-			echo "Limiting outbound connections to TCP ports $OB_TCP."
+		if [ -n "$PRINTCMD" ]; then
+			$PRINTCMD "Limiting outbound connections to TCP ports $OB_TCP."
 		fi
 		$IPTABLES -I OUTPUT 1 -p tcp -m multiport --dports $OB_TCP -j ACCEPT
 	fi
 	if [ -z $OB_UDP ]; then
-		if [ $PRINTSTATUS -eq 1 ]; then
-			echo "Not limiting outbound UDP connections."
+		if [ -n "$PRINTCMD" ]; then
+			$PRINTCMD "Not limiting outbound UDP connections."
 		fi
 		$IPTABLES -I OUTPUT 1 -p udp -j ACCEPT
 	else
-		if [ $PRINTSTATUS -eq 1 ]; then
-			echo "Limiting outbound connections to UDP ports $OB_UDP."
+		if [ -n "$PRINTCMD" ]; then
+			$PRINTCMD "Limiting outbound connections to UDP ports $OB_UDP."
 		fi
 		$IPTABLES -I OUTPUT 1 -p udp -m multiport --dports $OB_UDP -j ACCEPT
 	fi
@@ -366,8 +367,8 @@ else
 		cat $OB_TARGS
 	fi | sed 's/#.*//' | egrep -o "(^|[^0-9.])((25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])(/[0-9][0-9]?)?($|[^0-9.])" | while read net; do
 		if [ $ALLOWPING -eq 1 ]; then
-			if [ $PRINTSTATUS -eq 1 ]; then
-				echo "Allow ping/traceroute to $net..."
+			if [ -n "$PRINTCMD" ]; then
+				$PRINTCMD "Allow ping/traceroute to $net..."
 			fi
 			if [ $ALLICMP -eq 0 ]; then
 				$IPTABLES -I OUTPUT 1 -d $net -p icmp --icmp-type 8 -j ACCEPT
@@ -378,24 +379,24 @@ else
 		fi
 
 		if [ -z $OB_TCP ]; then
-			if [ $PRINTSTATUS -eq 1 ]; then
-				echo "Limiting outbound TCP connections to $net."
+			if [ -n "$PRINTCMD" ]; then
+				$PRINTCMD "Limiting outbound TCP connections to $net."
 			fi
 			$IPTABLES -I OUTPUT 1 -d $net -p tcp -j ACCEPT
 		else
-			if [ $PRINTSTATUS -eq 1 ]; then
-				echo "Limiting outbound TCP connections to $net on ports $OB_TCP."
+			if [ -n "$PRINTCMD" ]; then
+				$PRINTCMD "Limiting outbound TCP connections to $net on ports $OB_TCP."
 			fi
 			$IPTABLES -I OUTPUT 1 -d $net -p tcp -m multiport --dports $OB_TCP -j ACCEPT
 		fi
 		if [ -z $OB_UDP ]; then
-			if [ $PRINTSTATUS -eq 1 ]; then
-				echo "Limiting outbound UDP connections to $net."
+			if [ -n "$PRINTCMD" ]; then
+				$PRINTCMD "Limiting outbound UDP connections to $net."
 			fi
 			$IPTABLES -I OUTPUT 1 -d $net -p udp -j ACCEPT
 		else
-			if [ $PRINTSTATUS -eq 1 ]; then
-				echo "Limiting outbound UDP connections to $net on ports $OB_UDP."
+			if [ -n "$PRINTCMD" ]; then
+				$PRINTCMD "Limiting outbound UDP connections to $net on ports $OB_UDP."
 			fi
 			$IPTABLES -I OUTPUT 1 -d $net -p udp -m multiport --dports $OB_UDP -j ACCEPT
 		fi
@@ -404,8 +405,8 @@ fi
 
 if [ -z $IB_TARGS ]; then
 	if [ $ALLOWPING -eq 1 ]; then
-		if [ $PRINTSTATUS -eq 1 ]; then
-			echo "Respond to pings..."
+		if [ -n "$PRINTCMD" ]; then
+			$PRINTCMD "Respond to pings..."
 		fi
 		if [ $ALLICMP -eq 0 ]; then
 			$IPTABLES -I INPUT 1 -p icmp --icmp-type 8 -j ACCEPT
@@ -415,30 +416,30 @@ if [ -z $IB_TARGS ]; then
 	fi
 
 	if [ -z $IB_TCP ]; then
-		if [ $PRINTSTATUS -eq 1 ]; then
-			echo "Not allowing inbound TCP connections."
+		if [ -n "$PRINTCMD" ]; then
+			$PRINTCMD "Not allowing inbound TCP connections."
 		fi
 	else
-		if [ $PRINTSTATUS -eq 1 ]; then
-			echo "Allowing inbound TCP connections to ports $IB_TCP."
+		if [ -n "$PRINTCMD" ]; then
+			$PRINTCMD "Allowing inbound TCP connections to ports $IB_TCP."
 		fi
 		$IPTABLES -I INPUT 1 -p tcp -m multiport --dports $IB_TCP -j ACCEPT
 	fi
 	if [ -z $IB_UDP ]; then
-		if [ $PRINTSTATUS -eq 1 ]; then
-			echo "Not allowing inbound UDP connections."
+		if [ -n "$PRINTCMD" ]; then
+			$PRINTCMD "Not allowing inbound UDP connections."
 		fi
 	else
-		if [ $PRINTSTATUS -eq 1 ]; then
-			echo "Allowing inbound UDP connections to ports $IB_UDP."
+		if [ -n "$PRINTCMD" ]; then
+			$PRINTCMD "Allowing inbound UDP connections to ports $IB_UDP."
 		fi
 		$IPTABLES -I INPUT 1  -p udp -m multiport --dports $IB_UDP -j ACCEPT
 	fi
 else
 	cat $IB_TARGS | sed 's/#.*//' | egrep -o "(^|[^0-9.])((25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])(/[0-9][0-9]?)?($|[^0-9.])" | while read net; do
 		if [ $ALLOWPING -eq 1 ]; then
-			if [ $PRINTSTATUS -eq 1 ]; then
-				echo "Respond to pings from $net..."
+			if [ -n "$PRINTCMD" ]; then
+				$PRINTCMD "Respond to pings from $net..."
 			fi
 			if [ $ALLICMP -eq 0 ]; then
 				$IPTABLES -I INPUT 1 -s $net -p icmp --icmp-type 8 -j ACCEPT
@@ -448,25 +449,25 @@ else
 		fi
 
 		if [ -z $IB_TCP ]; then
-			if [ $PRINTSTATUS -eq 1 ]; then
-				#echo "Not allowing inbound TCP connections."
-				echo "Allowing inbound TCP connections from $net..."
+			if [ -n "$PRINTCMD" ]; then
+				#$PRINTCMD "Not allowing inbound TCP connections."
+				$PRINTCMD "Allowing inbound TCP connections from $net..."
 			fi
 			$IPTABLES -I INPUT 1 -s $net -p tcp -j ACCEPT
 		else
-			if [ $PRINTSTATUS -eq 1 ]; then
-				echo "Allowing inbound TCP connections from $net on ports $IB_TCP."
+			if [ -n "$PRINTCMD" ]; then
+				$PRINTCMD "Allowing inbound TCP connections from $net on ports $IB_TCP."
 			fi
 			$IPTABLES -I INPUT 1 -s $net -p tcp -m multiport --dports $IB_TCP -j ACCEPT
 		fi
 
 		if [ -z $IB_UDP ]; then
-			if [ $PRINTSTATUS -eq 1 ]; then
-				echo "Not allowing inbound UDP connections."
+			if [ -n "$PRINTCMD" ]; then
+				$PRINTCMD "Not allowing inbound UDP connections."
 			fi
 		else
-			if [ $PRINTSTATUS -eq 1 ]; then
-				echo "Allowing inbound UDP connections from $net on ports $IB_UDP."
+			if [ -n "$PRINTCMD" ]; then
+				$PRINTCMD "Allowing inbound UDP connections from $net on ports $IB_UDP."
 			fi
 			$IPTABLES -I INPUT 1 -s $net -p udp -m multiport --dports $IB_UDP -j ACCEPT
 		fi
@@ -484,9 +485,9 @@ allow_localhost
 
 # If requested so the rules just created.
 if [ $SHOWRULES -eq 1 ]; then
-	echo ""
-	if [ $PRINTSTATUS -eq 1 ]; then
-		echo "Applied rules:"
+	$PRINTCMD ""
+	if [ -n "$PRINTCMD" ]; then
+		$PRINTCMD "Applied rules:"
 	fi
 	$IPTABLES -S
 fi
