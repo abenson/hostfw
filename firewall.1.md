@@ -1,4 +1,4 @@
-% FIREWALL(1) iptables configuration generator | hostfw 0.5.1
+% FIREWALL(1) iptables configuration generator | hostfw 0.6.0
 %
 % November 2016
 
