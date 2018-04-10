@@ -255,6 +255,7 @@ if [ $AUTOTRUST -eq 1 ]; then
 		fi
 	else
 		$PRINTCMD "Make sure $DEFTRUST and $DEFTARGS exist."
+		exit
 	fi
 fi
 
