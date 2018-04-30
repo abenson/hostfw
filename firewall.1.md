@@ -1,6 +1,6 @@
-% FIREWALL(1) iptables configuration generator | hostfw 0.6.1
+% FIREWALL(1) iptables configuration generator | hostfw 0.6.3
 %
-% November 2016
+% November 2018
 
 
 # NAME
@@ -102,5 +102,5 @@ Only allow a host to connect to a proxy (tcp/8888) on a specific host (192.168.0
 
 # COPYRIGHT
 
-Copyright © 2016 Andrew Benson. License: MIT
+Copyright © 2018 Andrew Benson. License: MIT
 
