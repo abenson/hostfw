@@ -335,5 +335,16 @@ save_script_cb( FL_OBJECT * obj,
 }
 
 
+/***************************************
+ ***************************************/
+
+void
+save_file_picker_cb( FL_OBJECT * obj,
+                     long        data )
+{
+    /* Fill-in code for callback here */
+}
+
+
 
 

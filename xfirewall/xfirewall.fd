@@ -751,12 +751,12 @@ callback:
 argument: 
 
 --------------------
-class: FL_BUTTON
+class: FL_PIXMAPBUTTON
 type: FL_NORMAL_BUTTON
-box: 630 390 40 30
+box: 640 390 40 30
 boxtype: FL_UP_BOX
 colors: FL_COL1 FL_COL1
-alignment: FL_ALIGN_CENTER
+alignment: FL_ALIGN_BOTTOM
 style: FL_NORMAL_STYLE
 size: FL_DEFAULT_SIZE
 lcol: FL_BLACK
@@ -764,9 +764,12 @@ label:
 shortcut: 
 resize: FL_RESIZE_ALL
 gravity: FL_NoGravity FL_NoGravity
-name: 
-callback: 
-argument: 
+name: save_file_picker
+callback: save_file_picker_cb
+argument: 0
+    file: folder.xpm
+    fullpath: 0
+    data: folder2
 
 ==============================
 create_the_forms
