@@ -8,14 +8,14 @@ Unit of measure: FL_COORD_PIXEL
 
 =============== FORM ===============
 Name: xfirewall
-Width: 1024
-Height: 575
-Number of Objects: 39
+Width: 1022
+Height: 561
+Number of Objects: 42
 
 --------------------
 class: FL_BOX
 type: FL_FLAT_BOX
-box: 0 0 1024 575
+box: 0 0 1022 561
 boxtype: FL_FLAT_BOX
 colors: FL_COL1 FL_COL1
 alignment: FL_ALIGN_CENTER
@@ -555,7 +555,7 @@ argument:
 --------------------
 class: FL_LABELFRAME
 type: FL_ENGRAVED_FRAME
-box: 630 50 340 150
+box: 630 50 350 150
 boxtype: FL_NO_BOX
 colors: FL_BLACK FL_COL1
 alignment: FL_ALIGN_LEFT_TOP
@@ -713,6 +713,60 @@ gravity: FL_NoGravity FL_NoGravity
 name: show_rules
 callback: show_rules_cb
 argument: 0
+
+--------------------
+class: FL_CHECKBUTTON
+type: FL_PUSH_BUTTON
+box: 630 360 350 30
+boxtype: FL_NO_BOX
+colors: FL_COL1 FL_YELLOW
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: Instead of setting rules, generate and save script
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: save_script
+callback: save_script_cb
+argument: 0
+
+--------------------
+class: FL_INPUT
+type: FL_NORMAL_INPUT
+box: 680 390 290 30
+boxtype: FL_DOWN_BOX
+colors: FL_COL1 FL_MCOL
+alignment: FL_ALIGN_LEFT
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: 
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: 
+callback: 
+argument: 
+
+--------------------
+class: FL_BUTTON
+type: FL_NORMAL_BUTTON
+box: 630 390 40 30
+boxtype: FL_UP_BOX
+colors: FL_COL1 FL_COL1
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: 
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: 
+callback: 
+argument: 
 
 ==============================
 create_the_forms

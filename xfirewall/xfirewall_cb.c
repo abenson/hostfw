@@ -109,7 +109,7 @@ autotrust_cb( FL_OBJECT * obj,
 
 void
 default_rules_cb( FL_OBJECT * obj,
-            long        data )
+                  long        data )
 {
     /* Fill-in code for callback here */
 }
@@ -319,6 +319,17 @@ show_status_cb( FL_OBJECT * obj,
 void
 show_rules_cb( FL_OBJECT * obj,
                long        data )
+{
+    /* Fill-in code for callback here */
+}
+
+
+/***************************************
+ ***************************************/
+
+void
+save_script_cb( FL_OBJECT * obj,
+                long        data )
 {
     /* Fill-in code for callback here */
 }
