@@ -1,0 +1,718 @@
+Magic: 15000
+
+Internal Form Definition File
+    (do not change)
+
+Number of forms: 1
+Unit of measure: FL_COORD_PIXEL
+
+=============== FORM ===============
+Name: xfirewall
+Width: 1024
+Height: 575
+Number of Objects: 39
+
+--------------------
+class: FL_BOX
+type: FL_FLAT_BOX
+box: 0 0 1024 575
+boxtype: FL_FLAT_BOX
+colors: FL_COL1 FL_COL1
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: 
+shortcut: 
+resize: FL_RESIZE_NONE
+gravity: FL_NoGravity FL_NoGravity
+name: 
+callback: 
+argument: 
+
+--------------------
+class: FL_CHECKBUTTON
+type: FL_PUSH_BUTTON
+box: 40 30 180 20
+boxtype: FL_NO_BOX
+colors: FL_COL1 FL_YELLOW
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: Limit Outbound TCP Ports
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: outbound_tcp
+callback: outbound_tcp_cb
+argument: 0
+
+--------------------
+class: FL_CHECKBUTTON
+type: FL_PUSH_BUTTON
+box: 40 100 180 20
+boxtype: FL_NO_BOX
+colors: FL_COL1 FL_YELLOW
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: Limit Outbound UDP Ports
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: outbound_udp
+callback: outbound_udp_cb
+argument: 0
+
+--------------------
+class: FL_INPUT
+type: FL_NORMAL_INPUT
+box: 50 60 310 30
+boxtype: FL_DOWN_BOX
+colors: FL_COL1 FL_MCOL
+alignment: FL_ALIGN_LEFT
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: 
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: outbound_tcp_list
+callback: outbound_tcp_list_cb
+argument: 0
+
+--------------------
+class: FL_INPUT
+type: FL_NORMAL_INPUT
+box: 50 130 310 30
+boxtype: FL_DOWN_BOX
+colors: FL_COL1 FL_MCOL
+alignment: FL_ALIGN_LEFT
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: 
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: outbound_udp_list
+callback: outbound_udp_list_cb
+argument: 0
+
+--------------------
+class: FL_CHECKBUTTON
+type: FL_PUSH_BUTTON
+box: 40 170 180 20
+boxtype: FL_NO_BOX
+colors: FL_COL1 FL_YELLOW
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: Allow Inbound TCP
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: inbound_tcp
+callback: inbound_tcp_cb
+argument: 0
+
+--------------------
+class: FL_INPUT
+type: FL_NORMAL_INPUT
+box: 50 200 310 30
+boxtype: FL_DOWN_BOX
+colors: FL_COL1 FL_MCOL
+alignment: FL_ALIGN_LEFT
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: 
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: inbound_tcp_list
+callback: inbound_tcp_list_cb
+argument: 0
+
+--------------------
+class: FL_CHECKBUTTON
+type: FL_PUSH_BUTTON
+box: 40 250 180 20
+boxtype: FL_NO_BOX
+colors: FL_COL1 FL_YELLOW
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: Allow Inbound UDP
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: inbound_udp
+callback: inbound_udp_cb
+argument: 0
+
+--------------------
+class: FL_INPUT
+type: FL_NORMAL_INPUT
+box: 50 280 310 30
+boxtype: FL_DOWN_BOX
+colors: FL_COL1 FL_MCOL
+alignment: FL_ALIGN_LEFT
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: 
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: inbound_udp_list
+callback: inbound_udp_list_cb
+argument: 0
+
+--------------------
+class: FL_BUTTON
+type: FL_NORMAL_BUTTON
+box: 50 500 130 40
+boxtype: FL_UP_BOX
+colors: FL_COL1 FL_COL1
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: Autotrust
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: autotrust
+callback: autotrust_cb
+argument: 0
+
+--------------------
+class: FL_BUTTON
+type: FL_NORMAL_BUTTON
+box: 200 500 130 40
+boxtype: FL_UP_BOX
+colors: FL_COL1 FL_COL1
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: Default
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: default_rules
+callback: default_rules_cb
+argument: 0
+
+--------------------
+class: FL_BUTTON
+type: FL_NORMAL_BUTTON
+box: 350 500 130 40
+boxtype: FL_UP_BOX
+colors: FL_COL1 FL_COL1
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: Allow All
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: allow_all
+callback: allow_all_cb
+argument: 0
+
+--------------------
+class: FL_BUTTON
+type: FL_NORMAL_BUTTON
+box: 500 500 130 40
+boxtype: FL_UP_BOX
+colors: FL_COL1 FL_COL1
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: Deny All
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: deny_all
+callback: deny_all_cb
+argument: 0
+
+--------------------
+class: FL_BUTTON
+type: FL_NORMAL_BUTTON
+box: 700 500 130 40
+boxtype: FL_UP_BOX
+colors: FL_COL1 FL_COL1
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: Cancel
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: cancel
+callback: cancel_cb
+argument: 0
+
+--------------------
+class: FL_BUTTON
+type: FL_NORMAL_BUTTON
+box: 850 500 130 40
+boxtype: FL_UP_BOX
+colors: FL_COL1 FL_COL1
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: Accept
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: accept
+callback: accept_cb
+argument: 0
+
+--------------------
+class: FL_CHECKBUTTON
+type: FL_PUSH_BUTTON
+box: 410 30 240 20
+boxtype: FL_NO_BOX
+colors: FL_COL1 FL_YELLOW
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: Limit Outbound Hosts
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: outbound_hosts
+callback: outbound_hosts_cb
+argument: 0
+
+--------------------
+class: FL_LIGHTBUTTON
+type: FL_PUSH_BUTTON
+box: 420 50 150 30
+boxtype: FL_UP_BOX
+colors: FL_COL1 FL_YELLOW
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: Load from File
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: outbound_load_file
+callback: outbound_load_file_cb
+argument: 0
+
+--------------------
+class: FL_LIGHTBUTTON
+type: FL_PUSH_BUTTON
+box: 420 90 150 30
+boxtype: FL_UP_BOX
+colors: FL_COL1 FL_YELLOW
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: Enter Manually
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: outbound_enter_manually
+callback: outbound_enter_manually_cb
+argument: 0
+
+--------------------
+class: FL_CHECKBUTTON
+type: FL_PUSH_BUTTON
+box: 410 170 240 20
+boxtype: FL_NO_BOX
+colors: FL_COL1 FL_YELLOW
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: Allow Inbound Hosts
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: inbound_hosts
+callback: inbound_hosts_cb
+argument: 0
+
+--------------------
+class: FL_LIGHTBUTTON
+type: FL_PUSH_BUTTON
+box: 420 200 150 30
+boxtype: FL_UP_BOX
+colors: FL_COL1 FL_YELLOW
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: Load from File
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: inboud_load_file
+callback: inboud_load_file_cb
+argument: 0
+
+--------------------
+class: FL_LIGHTBUTTON
+type: FL_PUSH_BUTTON
+box: 420 240 150 30
+boxtype: FL_UP_BOX
+colors: FL_COL1 FL_YELLOW
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: Enter Manually
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: 
+callback: outbound_enter_manually_cb
+argument: 0
+
+--------------------
+class: FL_CHECKBUTTON
+type: FL_PUSH_BUTTON
+box: 410 320 240 20
+boxtype: FL_NO_BOX
+colors: FL_COL1 FL_YELLOW
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: Deny hosts regardless
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: deny_hosts
+callback: deny_hosts_cb
+argument: 0
+
+--------------------
+class: FL_LIGHTBUTTON
+type: FL_PUSH_BUTTON
+box: 420 350 150 30
+boxtype: FL_UP_BOX
+colors: FL_COL1 FL_YELLOW
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: Load from File
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: deny_load_file
+callback: deny_load_file_cb
+argument: 0
+
+--------------------
+class: FL_LIGHTBUTTON
+type: FL_PUSH_BUTTON
+box: 420 390 150 30
+boxtype: FL_UP_BOX
+colors: FL_COL1 FL_YELLOW
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: Enter Manually
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: 
+callback: deny_enter_manually_cb
+argument: 0
+
+--------------------
+class: FL_TEXT
+type: FL_NORMAL_TEXT
+box: 420 130 118 30
+boxtype: FL_FLAT_BOX
+colors: FL_COL1 FL_MCOL
+alignment: FL_ALIGN_LEFT|FL_ALIGN_INSIDE
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: Hosts loaded:
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: 
+callback: 
+argument: 
+
+--------------------
+class: FL_BOX
+type: FL_UP_BOX
+box: 527 130 43 30
+boxtype: FL_DOWN_BOX
+colors: FL_COL1 FL_COL1
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: 0
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: outbound_hosts_count
+callback: 
+argument: 
+
+--------------------
+class: FL_TEXT
+type: FL_NORMAL_TEXT
+box: 420 280 118 30
+boxtype: FL_FLAT_BOX
+colors: FL_COL1 FL_MCOL
+alignment: FL_ALIGN_LEFT|FL_ALIGN_INSIDE
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: Hosts loaded:
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: 
+callback: 
+argument: 
+
+--------------------
+class: FL_BOX
+type: FL_UP_BOX
+box: 527 280 43 30
+boxtype: FL_DOWN_BOX
+colors: FL_COL1 FL_COL1
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: 0
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: inbound_hosts_count
+callback: 
+argument: 
+
+--------------------
+class: FL_TEXT
+type: FL_NORMAL_TEXT
+box: 420 430 118 30
+boxtype: FL_FLAT_BOX
+colors: FL_COL1 FL_MCOL
+alignment: FL_ALIGN_LEFT|FL_ALIGN_INSIDE
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: Hosts loaded:
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: 
+callback: 
+argument: 
+
+--------------------
+class: FL_BOX
+type: FL_UP_BOX
+box: 527 430 43 30
+boxtype: FL_DOWN_BOX
+colors: FL_COL1 FL_COL1
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: 0
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: deny_hosts_count
+callback: 
+argument: 
+
+--------------------
+class: FL_LABELFRAME
+type: FL_ENGRAVED_FRAME
+box: 630 50 340 150
+boxtype: FL_NO_BOX
+colors: FL_BLACK FL_COL1
+alignment: FL_ALIGN_LEFT_TOP
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: Behaviors
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: 
+callback: 
+argument: 
+
+--------------------
+class: FL_CHECKBUTTON
+type: FL_PUSH_BUTTON
+box: 650 70 310 20
+boxtype: FL_NO_BOX
+colors: FL_COL1 FL_YELLOW
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: Send resets instead of dropping packets
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: send_resets
+callback: send_resets_cb
+argument: 0
+
+--------------------
+class: FL_CHECKBUTTON
+type: FL_PUSH_BUTTON
+box: 650 100 310 20
+boxtype: FL_NO_BOX
+colors: FL_COL1 FL_YELLOW
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: Don't restrict ICMP to only Echo/Reply
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: dont_restrict_icmp
+callback: dont_restrict_icmp_cb
+argument: 0
+
+--------------------
+class: FL_CHECKBUTTON
+type: FL_PUSH_BUTTON
+box: 650 130 310 20
+boxtype: FL_NO_BOX
+colors: FL_COL1 FL_YELLOW
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: Don't Allow DHCP
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: dont_allow_dhcp
+callback: dont_allow_dhcp_cb
+argument: 0
+
+--------------------
+class: FL_CHECKBUTTON
+type: FL_PUSH_BUTTON
+box: 650 160 310 20
+boxtype: FL_NO_BOX
+colors: FL_COL1 FL_YELLOW
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: Log Exceptions
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: log_exceptions
+callback: log_exceptions_cb
+argument: 0
+
+--------------------
+class: FL_LABELFRAME
+type: FL_ENGRAVED_FRAME
+box: 630 210 350 120
+boxtype: FL_NO_BOX
+colors: FL_BLACK FL_COL1
+alignment: FL_ALIGN_LEFT_TOP
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: Options
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: 
+callback: 
+argument: 
+
+--------------------
+class: FL_CHECKBUTTON
+type: FL_PUSH_BUTTON
+box: 650 230 310 20
+boxtype: FL_NO_BOX
+colors: FL_COL1 FL_YELLOW
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: Simulate setting firewall
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: simulate_only
+callback: simulate_only_cb
+argument: 0
+
+--------------------
+class: FL_CHECKBUTTON
+type: FL_PUSH_BUTTON
+box: 650 260 310 20
+boxtype: FL_NO_BOX
+colors: FL_COL1 FL_YELLOW
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: Show status messages
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: show_status
+callback: show_status_cb
+argument: 0
+
+--------------------
+class: FL_CHECKBUTTON
+type: FL_PUSH_BUTTON
+box: 650 290 310 20
+boxtype: FL_NO_BOX
+colors: FL_COL1 FL_YELLOW
+alignment: FL_ALIGN_CENTER
+style: FL_NORMAL_STYLE
+size: FL_DEFAULT_SIZE
+lcol: FL_BLACK
+label: Show rules after they are set
+shortcut: 
+resize: FL_RESIZE_ALL
+gravity: FL_NoGravity FL_NoGravity
+name: show_rules
+callback: show_rules_cb
+argument: 0
+
+==============================
+create_the_forms
