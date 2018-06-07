@@ -1,4 +1,9 @@
+#include <stdlib.h>
+
 #include "xfirewall.h"
+#include "common.h"
+
+extern FD_xfirewall *fd_xfirewall;
 
 /* Callbacks and freeobj handlers for form xfirewall */
 
@@ -10,7 +15,11 @@ void
 outbound_tcp_cb( FL_OBJECT * obj,
                  long        data )
 {
-    /* Fill-in code for callback here */
+    if(fl_get_button(obj)) {
+        xf_activate(fd_xfirewall->outbound_tcp_list);
+    } else {
+        xf_deactivate(fd_xfirewall->outbound_tcp_list);
+    }
 }
 
 
@@ -21,7 +30,11 @@ void
 outbound_udp_cb( FL_OBJECT * obj,
                  long        data )
 {
-    /* Fill-in code for callback here */
+    if(fl_get_button(obj)) {
+        xf_activate(fd_xfirewall->outbound_udp_list);
+    } else {
+        xf_deactivate(fd_xfirewall->outbound_udp_list);
+    }
 }
 
 
@@ -54,8 +67,11 @@ void
 inbound_tcp_cb( FL_OBJECT * obj,
                 long        data )
 {
-    /* Fill-in code for callback here */
-}
+    if(fl_get_button(obj)) {
+        xf_activate(fd_xfirewall->inbound_tcp_list);
+    } else {
+        xf_deactivate(fd_xfirewall->inbound_tcp_list);
+    }}
 
 
 /***************************************
@@ -76,7 +92,11 @@ void
 inbound_udp_cb( FL_OBJECT * obj,
                 long        data )
 {
-    /* Fill-in code for callback here */
+    if(fl_get_button(obj)) {
+        xf_activate(fd_xfirewall->inbound_udp_list);
+    } else {
+        xf_deactivate(fd_xfirewall->inbound_udp_list);
+    }
 }
 
 
@@ -142,7 +162,7 @@ void
 cancel_cb( FL_OBJECT * obj,
            long        data )
 {
-    /* Fill-in code for callback here */
+    exit(EXIT_SUCCESS);
 }
 
 
@@ -351,7 +371,12 @@ void
 save_file_picker_cb( FL_OBJECT * obj,
                      long        data )
 {
-    /* Fill-in code for callback here */
+       const char *filename;
+       filename = fl_show_fselector("Name of the saved script",
+                                    ".",
+                                "*.sh",
+                                "firewall.sh");
+       fl_set_input(fd_xfirewall->save_file_name, filename);
 }
 
 

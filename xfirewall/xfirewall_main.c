@@ -1,4 +1,5 @@
 #include "xfirewall.h"
+#include "common.h"
 
 FD_xfirewall *fd_xfirewall;
 
@@ -11,20 +12,22 @@ xf_set_initial( void )
 	FD_xfirewall *xf = fd_xfirewall;
 
 	/* port input lists */
-	fl_deactivate_object(xf->outbound_tcp_list);
-	fl_deactivate_object(xf->outbound_udp_list);
-	fl_deactivate_object(xf->inbound_tcp_list);
-	fl_deactivate_object(xf->inbound_udp_list);
+	xf_deactivate(xf->outbound_tcp_list);
+	xf_deactivate(xf->outbound_udp_list);
+	xf_deactivate(xf->inbound_tcp_list);
+	xf_deactivate(xf->inbound_udp_list);
 
 	/* host input buttons */
-	fl_deactivate_object(xf->outbound_load_file);
-	fl_deactivate_object(xf->outbound_enter_manually);
-	fl_deactivate_object(xf->inbound_load_file);
-	fl_deactivate_object(xf->inbound_enter_manually);
-	fl_deactivate_object(xf->deny_load_file);
-	fl_deactivate_object(xf->deny_enter_manually);
+	xf_deactivate(xf->outbound_load_file);
+	xf_deactivate(xf->outbound_enter_manually);
+	xf_deactivate(xf->inbound_load_file);
+	xf_deactivate(xf->inbound_enter_manually);
+	xf_deactivate(xf->deny_load_file);
+	xf_deactivate(xf->deny_enter_manually);
 
-	fl_deactivate_object(xf->save_file_name);
+	/* file picker */
+	xf_deactivate(xf->save_file_name);
+	xf_deactivate(xf->save_file_picker);
 }
 
 /***************************************

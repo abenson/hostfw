@@ -61,7 +61,7 @@ create_form_xfirewall( void )
     fdui->cancel = obj = fl_add_button( FL_NORMAL_BUTTON, 700, 500, 130, 40, "Cancel" );
     fl_set_object_callback( obj, cancel_cb, 0 );
 
-    fdui->accept = obj = fl_add_button( FL_NORMAL_BUTTON, 850, 500, 130, 40, "Accept" );
+    fdui->accept = obj = fl_add_button( FL_NORMAL_BUTTON, 850, 500, 130, 40, "Set Rules" );
     fl_set_object_callback( obj, accept_cb, 0 );
 
     fdui->outbound_hosts = obj = fl_add_checkbutton( FL_PUSH_BUTTON, 410, 30, 240, 20, "Limit Outbound Hosts" );
