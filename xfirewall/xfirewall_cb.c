@@ -1,5 +1,3 @@
-#include <stdlib.h>
-
 #include "xfirewall.h"
 
 /* Callbacks and freeobj handlers for form xfirewall */
@@ -144,7 +142,7 @@ void
 cancel_cb( FL_OBJECT * obj,
            long        data )
 {
-    exit(EXIT_SUCCESS);
+    /* Fill-in code for callback here */
 }
 
 
@@ -207,8 +205,19 @@ inbound_hosts_cb( FL_OBJECT * obj,
  ***************************************/
 
 void
-inboud_load_file_cb( FL_OBJECT * obj,
-                     long        data )
+inbound_load_file_cb( FL_OBJECT * obj,
+                      long        data )
+{
+    /* Fill-in code for callback here */
+}
+
+
+/***************************************
+ ***************************************/
+
+void
+inbound_enter_manually_cb( FL_OBJECT * obj,
+                           long        data )
 {
     /* Fill-in code for callback here */
 }

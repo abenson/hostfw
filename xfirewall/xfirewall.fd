@@ -368,8 +368,8 @@ label: Load from File
 shortcut: 
 resize: FL_RESIZE_ALL
 gravity: FL_NoGravity FL_NoGravity
-name: inboud_load_file
-callback: inboud_load_file_cb
+name: inbound_load_file
+callback: inbound_load_file_cb
 argument: 0
 
 --------------------
@@ -386,8 +386,8 @@ label: Enter Manually
 shortcut: 
 resize: FL_RESIZE_ALL
 gravity: FL_NoGravity FL_NoGravity
-name: 
-callback: outbound_enter_manually_cb
+name: inbound_enter_manually
+callback: inbound_enter_manually_cb
 argument: 0
 
 --------------------
@@ -440,7 +440,7 @@ label: Enter Manually
 shortcut: 
 resize: FL_RESIZE_ALL
 gravity: FL_NoGravity FL_NoGravity
-name: 
+name: deny_enter_manually
 callback: deny_enter_manually_cb
 argument: 0
 

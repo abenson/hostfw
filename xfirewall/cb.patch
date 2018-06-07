@@ -1,0 +1,40 @@
+diff --git a/xfirewall/xfirewall_cb.c b/xfirewall/xfirewall_cb.c
+index d92433a..902bda8 100644
+--- a/xfirewall/xfirewall_cb.c
++++ b/xfirewall/xfirewall_cb.c
+@@ -1,7 +1,10 @@
+ #include <stdlib.h>
++#include <stdio.h>
+ 
+ #include "xfirewall.h"
+ 
++extern FD_xfirewall *fd_xfirewall;
++
+ /* Callbacks and freeobj handlers for form xfirewall */
+ 
+ 
+@@ -12,7 +15,11 @@ void
+ outbound_tcp_cb( FL_OBJECT * obj,
+                  long        data )
+ {
+-    /* Fill-in code for callback here */
++       if(fl_get_button(obj)) {
++               fl_activate_object(fd_xfirewall->outbound_tcp_list);
++       } else {
++               fl_deactivate_object(fd_xfirewall->outbound_tcp_list);
++       }
+ }
+ 
+ 
+@@ -342,7 +349,12 @@ void
+ save_file_picker_cb( FL_OBJECT * obj,
+                      long        data )
+ {
+-    /* Fill-in code for callback here */
++       const char *filename;
++       filename = fl_show_fselector("Name of the saved script",
++                                    ".",
++                                "*.sh",
++                                "firewall.sh");
++       fl_set_input(fd_xfirewall->save_file_name, filename);
+ }
