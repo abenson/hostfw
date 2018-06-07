@@ -746,7 +746,7 @@ label:
 shortcut: 
 resize: FL_RESIZE_ALL
 gravity: FL_NoGravity FL_NoGravity
-name: 
+name: save_file_name
 callback: 
 argument: 
 
