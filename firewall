@@ -444,7 +444,7 @@ else
 			if [ $ALLICMP -eq 0 ]; then
 				$IPTABLES -I INPUT 1 -s $net -p icmp --icmp-type 8 -j ACCEPT
 			else
-				$IPTABLES -I INTUT 1 -s $net -p icmp -j ACCEPT
+				$IPTABLES -I INPUT 1 -s $net -p icmp -j ACCEPT
 			fi
 		fi
 
