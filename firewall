@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (c) 2019, Andrew C. Benson
+# Copyright (c) 2020, Andrew C. Benson
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-VERSION="0.6.4"
+VERSION="0.6.99"
 
 # Simple host-based permit-by-exception iptables generation script.
 
@@ -54,12 +54,11 @@ SCRIPTGEN="0"
 DEFTRUST="/etc/trusted.hosts"
 DEFTARGS="/etc/target.hosts"
 DEFEXCLD="/etc/exclude.hosts"
-
-IPTABLES=`which iptables 2>/dev/null`
+IPVER=4
 
 version()
 {
-	echo "`basename $0` v$VERSION; Copyright (c) 2016, Andrew C. Benson"
+	echo "`basename $0` v$VERSION; Copyright (c) 2020, Andrew C. Benson"
 	echo
 	echo You can find more information, leave feedback and feature requests, and
 	echo find the latest version at the project page: http://github.com/abenson/hostfw
@@ -81,6 +80,9 @@ help_and_quit()
 
 	    -v                 Display version.
 
+	    -4                 Generate rules for IPv4 (default)
+	    -6                 Generate rules for IPv6
+
 	    -r                 Send TCP RST instead of dropping packet.
 
 	    -p                 Disallow incoming PING
@@ -88,7 +90,8 @@ help_and_quit()
 	    -d                 Disallow DHCP.
 
 	    -tt                Automatically set rules based on /etc/trusted.hosts
-                           and /etc/target.hosts
+	                       and /etc/target.hosts (for IPv6, /etc/trusted6.hosts
+	                       and /etc/target6.hosts)
 
 	    -ot <...>          Comma separated list of allowed TCP ports outbound.
 	    -ou <...>          Comma separated list of allowed UDP ports outbound.
@@ -112,6 +115,7 @@ help_and_quit()
 	    -S                 Show rules after setting.
 
 	Defaults:
+	    Defaults to IPv4.
 	    Outbound connections will be allowed on all ports to all hosts.
 	    Inbound connections will be limited to related outbound traffic.
 	    DHCP will be enabled.
@@ -175,9 +179,11 @@ while [ ! -z "$1" ]; do
 		"-tt")
 			AUTOTRUST="1" ;;
 		"-s" )
-			SCRIPTGEN="1"
-			IPTABLES="echo /usr/bin/env iptables"
-			PRINTCMD="echo # " ;;
+			SCRIPTGEN="1" ;;
+		"-4" )
+			IPVER=4 ;;
+		"-6" )
+			IPVER=6 ;;
 		"-q" )
 			PRINTCMD="" ;;
 		* )
@@ -198,9 +204,32 @@ fi
 # We want to make sure iptables is available before we attempt to create
 # the rules.
 
+if [ $IPVER -eq 4 ]; then
+	IPTABLES=`which iptables 2>/dev/null`
+	LOCALHOST="127.0.0.8/8"
+elif [ $IPVER -eq 6 ]; then
+	IPTABLES=`which ip6tables 2>/dev/null`
+	LOCALHOST="::1"
+	DEFTRUST="/etc/trusted6.hosts"
+	DEFTARGS="/etc/target6.hosts"
+	DEFEXCLD="/etc/exclude6.hosts"
+fi
+
 if [ -z "$IPTABLES" ] && [ "$SCRIPTGEN" -eq 0 ] ; then
 	echo "Unable to find \`iptables\` in path."
 	exit
+fi
+
+if [ "$SCRIPTGEN" -eq 1 ]; then
+	if [ -z "$IPTABLES" ]; then
+		case IPVER in
+			4) IPTABLES="echo /usr/bin/env iptables" ;;
+			6) IPTABLES="echo /usr/bin/env ip6tables" ;;
+		esac
+	else
+		IPTABLES="echo $IPTABLES"
+	fi
+	PRINTCMD=" echo # "
 fi
 
 # Handy wrapper to clear the rules.
@@ -240,8 +269,8 @@ allow_localhost()
 	if [ -n "$PRINTCMD" ]; then
 		$PRINTCMD "Allowing traffic for localhost."
 	fi
-	$IPTABLES -I INPUT 1 -s 127.0.0.1/8 -d 127.0.0.1/8 -j ACCEPT
-	$IPTABLES -I OUTPUT 1 -s 127.0.0.1/8 -d 127.0.0.1/8 -j ACCEPT
+	$IPTABLES -I INPUT 1 -s "$LOCALHOST" -d "$LOCALHOST" -j ACCEPT
+	$IPTABLES -I OUTPUT 1 -s "$LOCALHOST" -d "$LOCALHOST" -j ACCEPT
 }
 
 # Setup for autotrust.
@@ -317,8 +346,16 @@ if [ $ALLOWDHCP -eq 1 ]; then
 	if [ -n "$PRINTCMD" ]; then
 		$PRINTCMD "Allowing DHCP..."
 	fi
-	$IPTABLES -I INPUT 1 -p udp --dport 67:68 --sport 67:68 -j ACCEPT
-	$IPTABLES -I OUTPUT 1 -p udp --dport 67:68 --sport 67:68 -j ACCEPT
+	case $IPVER in
+		4)
+			$IPTABLES -I INPUT 1 -p udp --dport 67:68 --sport 67:68 -j ACCEPT
+			$IPTABLES -I OUTPUT 1 -p udp --dport 67:68 --sport 67:68 -j ACCEPT
+			;;
+		6)
+			$IPTABLES -I INPUT 1 -p udp --dport 546:547 --sport 546:547 -j ACCEPT
+			$IPTABLES -I OUTPUT 1 -p udp --dport 546:547 --sport 546:547 -j ACCEPT
+			;;
+	esac
 fi
 
 # Allow related connections.
@@ -333,10 +370,19 @@ if [ -z $OB_TARGS ]; then
 		 $PRINTCMD "Allowing outbound ICMP..."
 	fi
 	if [ $ALLICMP -eq 0 ]; then
-		$IPTABLES -I OUTPUT 1 -p icmp --icmp-type 8 -j ACCEPT
-		$IPTABLES -I OUTPUT 1 -p icmp --icmp-type 0 -j ACCEPT
+		case $IPVER in
+			4) $IPTABLES -I OUTPUT 1 -p icmp --icmp-type echo-request -j ACCEPT
+			   $IPTABLES -I OUTPUT 1 -p icmp --icmp-type echo-reply -j ACCEPT
+			   ;;
+			6) $IPTABLES -I OUTPUT 1 -p icmp6 --icmp6-type echo-request -j ACCEPT
+			   $IPTABLES -I OUTPUT 1 -p icmp6 --icmp6-type echo-reply -j ACCEPT
+			   ;;
+		esac
 	else
-		$IPTABLES -I OUTPUT 1 -p icmp -j ACCEPT
+		case $IPVER in
+			4) $IPTABLES -I OUTPUT 1 -p icmp -j ACCEPT ;;
+			6) $IPTABLES -I OUTPUT 1 -p icmp6 -j ACCEPT ;;
+		esac
 	fi
 	if [ -z $OB_TCP ]; then
 		if [ -n "$PRINTCMD" ]; then
@@ -365,16 +411,25 @@ else
 		cat $OB_TARGS $IB_TARGS
 	else
 		cat $OB_TARGS
-	fi | sed 's/#.*//' | egrep -o "(^|[^0-9.])((25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])(/[0-9][0-9]?)?($|[^0-9.])" | while read net; do
+	fi | sed 's/#.*//' | while read net; do
 		if [ $ALLOWPING -eq 1 ]; then
 			if [ -n "$PRINTCMD" ]; then
 				$PRINTCMD "Allow ping/traceroute to $net..."
 			fi
 			if [ $ALLICMP -eq 0 ]; then
-				$IPTABLES -I OUTPUT 1 -d $net -p icmp --icmp-type 8 -j ACCEPT
-				$IPTABLES -I OUTPUT 1 -d $net -p icmp --icmp-type 0 -j ACCEPT
+				case $IPVER in
+					4) $IPTABLES -I OUTPUT 1 -d $net -p icmp --icmp-type echo-request -j ACCEPT
+					   $IPTABLES -I OUTPUT 1 -d $net -p icmp --icmp-type echo-reply -j ACCEPT
+					   ;;
+					6) $IPTABLES -I OUTPUT 1 -d $net -p icmp6 --icmp6-type echo-request -j ACCEPT
+					   $IPTABLES -I OUTPUT 1 -d $net -p icmp6 --icmp6-type echo-reply -j ACCEPT
+					   ;;
+				esac
 			else
-				$IPTABLES -I OUTPUT 1 -d $net -p icmp -j ACCEPT
+				case $IPVER in
+					4) $IPTABLES -I OUTPUT 1 -d $net -p icmp -j ACCEPT ;;
+ 					6) $IPTABLES -I OUTPUT 1 -d $net -p icmp6 -j ACCEPT ;;
+				esac
 			fi
 		fi
 
@@ -409,9 +464,15 @@ if [ -z $IB_TARGS ]; then
 			$PRINTCMD "Respond to pings..."
 		fi
 		if [ $ALLICMP -eq 0 ]; then
-			$IPTABLES -I INPUT 1 -p icmp --icmp-type 8 -j ACCEPT
+			case $IPVER in
+				4) $IPTABLES -I INPUT 1 -p icmp --icmp-type echo-reply -j ACCEPT ;;
+				6) $IPTABLES -I INPUT 1 -p icmp6 --icmp6-type echo-reply -j ACCEPT ;;
+			esac
 		else
-			$IPTABLES -I INPUT 1 -p icmp -j ACCEPT
+			case $IPVER in
+				4) $IPTABLES -I INPUT 1 -p icmp -j ACCEPT ;;
+				6) $IPTABLES -I INPUT 1 -p icmp6 -j ACCEPT ;;
+			esac
 		fi
 	fi
 
@@ -436,15 +497,21 @@ if [ -z $IB_TARGS ]; then
 		$IPTABLES -I INPUT 1  -p udp -m multiport --dports $IB_UDP -j ACCEPT
 	fi
 else
-	cat $IB_TARGS | sed 's/#.*//' | egrep -o "(^|[^0-9.])((25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])(/[0-9][0-9]?)?($|[^0-9.])" | while read net; do
+	cat $IB_TARGS | sed 's/#.*//' | while read net; do
 		if [ $ALLOWPING -eq 1 ]; then
 			if [ -n "$PRINTCMD" ]; then
 				$PRINTCMD "Respond to pings from $net..."
 			fi
 			if [ $ALLICMP -eq 0 ]; then
-				$IPTABLES -I INPUT 1 -s $net -p icmp --icmp-type 8 -j ACCEPT
+				case $IPVER in
+					4) $IPTABLES -I INPUT 1 -s $net -p icmp --icmp-type echo-request -j ACCEPT ;;
+					6) $IPTABLES -I INPUT 1 -s $net -p icmp6 --icmp6-type echo-request -j ACCEPT ;;
+				esac
 			else
-				$IPTABLES -I INPUT 1 -s $net -p icmp -j ACCEPT
+				case $IPVER in
+					4) $IPTABLES -I INPUT 1 -s $net -p icmp -j ACCEPT ;;
+					6) $IPTABLES -I INPUT 1 -s $net -p icmp6 -j ACCEPT ;;
+				esac
 			fi
 		fi
 
@@ -475,7 +542,7 @@ else
 fi
 
 if [ -n "$EX_TARGS" ]; then
-	cat $EX_TARGS | sed 's/#.*//' | egrep -o "(^|[^0-9.])((25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9]?[0-9])(/[0-9][0-9]?)?($|[^0-9.])" | while read net; do
+	cat $EX_TARGS | sed 's/#.*//' | while read net; do
 		$IPTABLES -I INPUT 1 -s $net -j DROP
 		$IPTABLES -I OUTPUT 1 -d $net -j DROP
 	done
